@@ -13,7 +13,7 @@
 
 - 환경 이름: **`critconn`**. 이 프로젝트만 쓴다. 다른 프로젝트 환경은 쓰지도 고치지도 않는다.
 - 선언 파일: [`env/critconn.yml`](../env/critconn.yml). 패키지를 더하면 같은 커밋에서 고친다 (`chore(env):`). 새 패키지는 묻고 더한다.
-- 채널은 conda-forge 만 쓴다. 본체 conda 의 기본 채널(defaults)은 이용약관 동의가 필요한데 `conda env create` 로는 피할 수 없어서, `env/create-critconn.ps1` 이 yml 을 읽어 `conda create --override-channels -c conda-forge` 로 만들고 환경 `.condarc` 를 conda-forge 로 고정한다. PyTorch 는 CUDA 12.8 휠(pip)로 설치한다. RTX 50 시리즈(Blackwell)는 CUDA 12.8 이상 빌드가 필요하다.
+- 채널은 conda-forge 만 쓴다. 본체 conda 의 기본 채널(defaults)은 이용약관 동의가 필요한데 `conda env create` 로는 피할 수 없어서, `env/create-critconn.ps1` 이 yml 을 읽어 `conda create --override-channels -c conda-forge` 로 만들고 환경 `.condarc` 를 conda-forge 로 고정한다. PyTorch 는 pip 로 `torch==2.15.0+cu132` 를 PyTorch 인덱스에서만(`--index-url`) 받는다. RTX 50 시리즈(Blackwell)는 CUDA 12.8 이상 빌드가 필요하고, 본체 드라이버(616.92)는 CUDA 13.4 까지 지원한다. `--extra-index-url` 을 쓰면 PyPI 의 CPU 빌드가 더 높은 버전으로 잡혀 GPU 를 못 쓴다.
 - **인터프리터는 절대경로로 부른다.** `conda activate` 에 의존하지 않는다.
 
 ```powershell

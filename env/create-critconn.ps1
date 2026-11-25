@@ -31,4 +31,5 @@ if ($LASTEXITCODE -ne 0) { throw "conda create 실패 ($LASTEXITCODE)" }
 
 & "$envDir\python.exe" -m pip install --no-input @pipArgs
 if ($LASTEXITCODE -ne 0) { throw "pip install 실패 ($LASTEXITCODE)" }
-& "$envDir\python.exe" -c "import torch; print(torch.__version__, torch.version.cuda, torch.cuda.is_available())"
+& "$envDir\python.exe" -c "import torch; print(torch.__version__, torch.version.cuda, torch.cuda.is_available()); assert torch.cuda.is_available(), 'CUDA 빌드가 아니다'"
+if ($LASTEXITCODE -ne 0) { throw 'PyTorch 가 CUDA 를 쓰지 못한다 (CPU 빌드가 설치됐는지 확인)' }
