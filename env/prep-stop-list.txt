@@ -1,2 +1,7 @@
 # 측정 전 종료할 프로세스 이름 (env/prep-measure.ps1 -Apply). 한 줄에 하나, 확장자 없이.
 # env/prep-*-before.txt 기록을 보고 사람이 정해 채운다. 안티치트·드라이버 서비스는 넣지 않는다.
+# 2026-11-25 env/prep-20261125-1916-before.txt 기록을 보고 사람이 정함 (STATE 결정 기록)
+RadeonSoftware
+AMDRSSrcExt
+KakaoTalk
+PhoneExperienceHost
