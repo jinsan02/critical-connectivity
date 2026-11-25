@@ -1,22 +1,22 @@
 # 이 프로젝트 전용 conda 환경 (docs/ENVIRONMENT.md).
-# 설치 후 실제 버전을 고정한다 (STATE.md 열린 질문). 패키지를 더하면 같은 커밋에서 고친다.
+# 2026-11-25 본체에 설치한 버전으로 고정했다. 패키지를 더하면 같은 커밋에서 고친다.
 # 설치는 env/create-critconn.ps1 로 한다 (conda env create 는 defaults 채널을 피하지 못한다).
 name: critconn
 channels:
   - conda-forge
 dependencies:
-  - python=3.12
-  - numpy
-  - scipy
-  - polars
-  - pyarrow
-  - networkx
-  - matplotlib
-  - pyyaml
-  - tensorboard
-  - pytest
-  - ruff
-  - pip
+  - python=3.12.16
+  - numpy=2.5.5
+  - scipy=1.18.1
+  - polars=2.1.0
+  - pyarrow=26.0.1
+  - networkx=3.7
+  - matplotlib=3.11.2
+  - pyyaml=6.0.3
+  - tensorboard=2.21.0
+  - pytest=9.2.0
+  - ruff=0.17.6
+  - pip=26.2.2
   - pip:
       # RTX 50 시리즈(Blackwell)는 CUDA 12.8 이상 빌드가 필요하다. 본체 드라이버 616.92 = CUDA 13.4 까지.
       # --index-url 만 쓴다: --extra-index-url 이면 PyPI 의 CPU 빌드가 더 높은 버전으로 잡힌다 (2026-11-25 실제로 일어남).

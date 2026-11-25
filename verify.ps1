@@ -5,15 +5,19 @@ Set-Location $PSScriptRoot
 $py = 'C:\ProgramData\anaconda3\envs\critconn\python.exe'
 if (-not (Test-Path $py)) { $py = Join-Path $env:USERPROFILE 'anaconda3\envs\critconn\python.exe' }
 if (-not (Test-Path $py)) { $py = 'python' }
+# conda-forge 의 ruff 는 python 모듈이 아니라 Library\bin\ruff.exe 다
+$ruff = Join-Path (Split-Path $py -Parent) 'Library\bin\ruff.exe'
+if (Test-Path $ruff) { $ruffExe = $ruff; $ruffPre = @() } else { $ruffExe = $py; $ruffPre = @('-m', 'ruff') }
 Write-Host "python: $py"
+Write-Host "ruff  : $ruffExe $($ruffPre -join ' ')"
 $fail = 0
 
 Write-Host '== 린트 (ruff check)'
-& $py -m ruff check .
+& $ruffExe @ruffPre check .
 if ($LASTEXITCODE -ne 0) { $fail = 1 }
 
 Write-Host '== 포맷 (ruff format --check)'
-& $py -m ruff format --check .
+& $ruffExe @ruffPre format --check .
 if ($LASTEXITCODE -ne 0) { $fail = 1 }
 
 Write-Host '== 테스트'
