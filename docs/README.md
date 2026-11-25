@@ -11,6 +11,6 @@
 | 데이터셋 조사 | [`plan/dataset_search_modular.md`](plan/dataset_search_modular.md) |
 | 2025~2026 신규성 검색 | [`plan/novelty_search_2025_2026.md`](plan/novelty_search_2025_2026.md) |
 | 참고문헌 검증 (v0.2) | [`plan/reference_verification_v0.2.md`](plan/reference_verification_v0.2.md) |
-| 지난 기획서 (구현 기준 아님) | [`지난설계/`](지난설계/README.md) |
+| 지난 기획서 v0.1~v0.3 | 저장소에 두지 않는다. 변경 이력은 v0.4 첫머리 요약 |
 
 예정 문서 (기획서 §17): `related_work_log.md`, `preregistration.md`(Gate 2.5), `deviation_log.md`, `extension_preregistration.md`.

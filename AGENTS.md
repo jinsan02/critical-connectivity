@@ -30,7 +30,7 @@ tail -n 15 experiments/LEDGER.tsv
 | 커밋 · 브랜치 · 태그 | `docs/COMMIT_CONVENTION.md` | `tools/check_commit_msg.py` 가 집행 |
 | 원장 열 | `docs/LEDGER_SCHEMA.md` | `tools/validate_ledger.py` 와 같아야 한다 |
 | 환경 | `docs/ENVIRONMENT.md`, `env/critconn.yml` | |
-| 지난 기획서 | `docs/지난설계/` | 구현 기준으로 쓰지 않는다 |
+| 지난 기획서 v0.1~v0.3 | 저장소에 두지 않는다 | 변경 이력은 v0.4 첫머리 요약 |
 
 ## 4. 폴더
 
