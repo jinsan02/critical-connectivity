@@ -1,0 +1,16 @@
+# docs/ — 문서 지도
+
+| 질문 | 문서 |
+| --- | --- |
+| 무엇을 하면 안 되나 | [`RULES.md`](RULES.md) |
+| 커밋 · 브랜치 · 태그 | [`COMMIT_CONVENTION.md`](COMMIT_CONVENTION.md) |
+| 실험 한 건은 어떻게 흘러가나 | [`WORKFLOW.md`](WORKFLOW.md) |
+| 하드웨어 · conda · push 설정 | [`ENVIRONMENT.md`](ENVIRONMENT.md) |
+| 원장 열 | [`LEDGER_SCHEMA.md`](LEDGER_SCHEMA.md) |
+| 무엇을 만드나 (기준 기획서) | [`plan/research_plan_v0.4.md`](plan/research_plan_v0.4.md) |
+| 데이터셋 조사 | [`plan/dataset_search_modular.md`](plan/dataset_search_modular.md) |
+| 2025~2026 신규성 검색 | [`plan/novelty_search_2025_2026.md`](plan/novelty_search_2025_2026.md) |
+| 참고문헌 검증 (v0.2) | [`plan/reference_verification_v0.2.md`](plan/reference_verification_v0.2.md) |
+| 지난 기획서 (구현 기준 아님) | [`지난설계/`](지난설계/README.md) |
+
+예정 문서 (기획서 §17): `related_work_log.md`, `preregistration.md`(Gate 2.5), `deviation_log.md`, `extension_preregistration.md`.

@@ -1,0 +1,48 @@
+# ── 데이터 (생성 규칙과 해시만 커밋. 기획서 §7.1.1) ─────────────────────────
+data/
+
+# ── 체크포인트·가중치 (기획서 §15.2: 약 370GB, git 밖) ──────────────────────
+checkpoints/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.npy
+*.npz
+
+# ── 결과: 그림은 커밋, 지표 Parquet·Activation 은 git 밖 (백업 대상) ──────
+results/metrics/
+results/activations/
+results/graphs/
+
+# ── run 작업 디렉터리: config·env·요약은 커밋, 원시 로그는 제외 ────────────
+experiments/runs/**/raw/
+experiments/runs/**/*.log
+experiments/runs/**/events.out.tfevents.*
+runs/
+
+# ── lockbox: 확증 단계 전용 자료 (docs/RULES.md 3번) ───────────────────────
+lockbox/
+
+# ── 설치 파일 ──────────────────────────────────────────────────────────────
+downloads/
+
+# ── Python ────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.venv/
+build/
+*.egg-info/
+
+# ── 비밀값 ────────────────────────────────────────────────────────────────
+.env
+.secrets/
+
+# ── 기타 ──────────────────────────────────────────────────────────────────
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

@@ -1,0 +1,19 @@
+[project]
+name = "critical-connectivity"
+version = "0.0.0"
+description = "Is there an architecture-invariant critical connectivity for emergent generalization?"
+requires-python = ">=3.11"
+# 실행 의존성은 env/critconn.yml 에 고정한다 (docs/ENVIRONMENT.md).
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["data", "checkpoints", "results", "lockbox"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-p no:cacheprovider"

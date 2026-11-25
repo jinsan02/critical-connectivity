@@ -1,0 +1,22 @@
+# 이 프로젝트 전용 conda 환경 (docs/ENVIRONMENT.md).
+# 설치 후 실제 버전을 고정한다 (STATE.md 열린 질문). 패키지를 더하면 같은 커밋에서 고친다.
+name: critconn
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - numpy
+  - scipy
+  - polars
+  - pyarrow
+  - networkx
+  - matplotlib
+  - pyyaml
+  - tensorboard
+  - pytest
+  - ruff
+  - pip
+  - pip:
+      # RTX 50 시리즈(Blackwell)는 CUDA 12.8 이상 빌드가 필요하다.
+      - --extra-index-url https://download.pytorch.org/whl/cu128
+      - torch

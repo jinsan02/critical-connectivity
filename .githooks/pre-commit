@@ -1,0 +1,25 @@
+#!/bin/sh
+# 저장소에 들어가면 안 되는 것을 막는다. 본체는 tools/precheck.py.
+set -e
+ROOT="$(git rev-parse --show-toplevel)"
+
+for PY in "C:/ProgramData/anaconda3/envs/critconn/python.exe" "$HOME/anaconda3/envs/critconn/python.exe" python3 python; do
+    if "$PY" -c "import sys" >/dev/null 2>&1; then
+        exec "$PY" "$ROOT/tools/precheck.py"
+    fi
+done
+
+echo "  (python 없음 — 경로 규칙만 검사한다)" >&2
+FILES="$(git diff --cached --name-only --diff-filter=ACMR)"
+FAIL=0
+for f in $FILES; do
+    case "$f" in
+        *lockbox*)
+            echo "  $f: lockbox 경로는 커밋할 수 없다" >&2; FAIL=1 ;;
+        data/*|checkpoints/*|results/metrics/*|results/activations/*|downloads/*)
+            echo "  $f: 커밋 금지 경로" >&2; FAIL=1 ;;
+        *.pt|*.pth|*.ckpt|*.safetensors|*.bin|*.npy|*.npz|*.pkl|*.h5)
+            echo "  $f: 가중치·텐서 바이너리는 커밋하지 않는다" >&2; FAIL=1 ;;
+    esac
+done
+exit $FAIL

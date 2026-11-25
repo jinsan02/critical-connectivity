@@ -1,0 +1,44 @@
+name: 실험
+description: 가설 하나를 시험한다 (기획서 §9 EXP, §15.1 단계 P0~P7)
+title: "exp(<scope>): <가설 요약>"
+labels: ["experiment"]
+body:
+  - type: input
+    id: ids
+    attributes:
+      label: 단계 · 실험 ID · 기준선 run_id
+      placeholder: "P2 · EXP-02 · 기준선 p0_r1_..."
+    validations:
+      required: true
+  - type: textarea
+    id: hypothesis
+    attributes:
+      label: 가설
+      description: 기획서의 어느 가설(H1~H7, X1~X5)인지, 확증인지 탐색인지(Gate 2.5 이전은 탐색)
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: 바꿀 것
+      description: 대상 파일·설정(아키텍처, ρ, Router, Seed 흐름), 바꾸지 않는 것
+    validations:
+      required: true
+  - type: textarea
+    id: expect
+    attributes:
+      label: 기대 지표와 위험
+      description: 어느 지표(T_grok, 창발 확률, C_eff …)가 어떻게, 무엇이 교란할 수 있는지
+    validations:
+      required: true
+  - type: textarea
+    id: verify
+    attributes:
+      label: 확인 방법과 완료 조건
+      description: 실행 수(Seed 흐름별), S_max, 판정 기준(결과 보기 전에 정함)
+      value: |
+        - [ ] 사전 검사 (pytest · 파라미터 수 · 분할 무결성):
+        - [ ] 실행 (조건 × Seed):
+        - [ ] 판정 기준:
+    validations:
+      required: true
