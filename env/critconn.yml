@@ -1,9 +1,9 @@
 # 이 프로젝트 전용 conda 환경 (docs/ENVIRONMENT.md).
 # 설치 후 실제 버전을 고정한다 (STATE.md 열린 질문). 패키지를 더하면 같은 커밋에서 고친다.
+# 설치는 env/create-critconn.ps1 로 한다 (conda env create 는 defaults 채널을 피하지 못한다).
 name: critconn
 channels:
   - conda-forge
-  - nodefaults  # 기본 채널(defaults)은 이용약관 동의가 필요하다
 dependencies:
   - python=3.12
   - numpy

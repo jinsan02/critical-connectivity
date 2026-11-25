@@ -66,7 +66,7 @@ CI(`.github/workflows/ci.yml`)는 push · PR 마다 GPU 없이 돈다: ruff 린�
 git clone https://github.com/jinsan02/critical-connectivity.git C:\critical-connectivity
 cd C:\critical-connectivity
 git config core.hooksPath .githooks
-conda env create -f env\critconn.yml
+powershell -NoProfile -ExecutionPolicy Bypass -File env\create-critconn.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File verify.ps1
 ```
 

@@ -54,7 +54,7 @@ tail -n 15 experiments/LEDGER.tsv
 
 ```powershell
 # 환경 (docs/ENVIRONMENT.md)
-conda env create -f env\critconn.yml
+powershell -NoProfile -ExecutionPolicy Bypass -File env\create-critconn.ps1
 # 검증 — 커밋 전에
 powershell -NoProfile -ExecutionPolicy Bypass -File verify.ps1
 ```

@@ -18,7 +18,7 @@
 git clone https://github.com/jinsan02/critical-connectivity.git
 cd critical-connectivity
 git config core.hooksPath .githooks
-conda env create -f env\critconn.yml
+powershell -NoProfile -ExecutionPolicy Bypass -File env\create-critconn.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File verify.ps1
 ```
 
