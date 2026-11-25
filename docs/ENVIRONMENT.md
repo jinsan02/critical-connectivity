@@ -40,17 +40,14 @@ powershell -NoProfile -ExecutionPolicy Bypass -File verify.ps1
 ssh-keygen -t ed25519 -f $HOME\.ssh\critconn_deploy -C "critconn-deploy"
 ```
 
-공개키(`critconn_deploy.pub`)를 GitHub 저장소 Settings → Deploy keys 에 **Allow write access** 로 등록하고, `~/.ssh/config` 에 다음을 더한다.
+공개키(`critconn_deploy.pub`)를 GitHub 저장소 Settings → Deploy keys 에 **Allow write access** 로 등록하고(2026-11-25 등록: `desktop-5070 (DESKTOP-053T952)`), 이 저장소에서만 그 키를 쓰게 한다. strata-local-llm 과 같은 방식이다.
 
+```powershell
+git config core.sshCommand "ssh -i C:/Users/jinsan/.ssh/critconn_deploy -o IdentitiesOnly=yes"
+git remote set-url origin git@github.com:jinsan02/critical-connectivity.git
+git config user.name jinsan02
+git config user.email <GitHub 계정 이메일>
 ```
-Host github-critconn
-    HostName github.com
-    User git
-    IdentityFile ~/.ssh/critconn_deploy
-    IdentitiesOnly yes
-```
-
-원격 주소는 `git@github-critconn:jinsan02/critical-connectivity.git` 을 쓴다.
 
 ## 5. 정리 · 측정 조건
 
