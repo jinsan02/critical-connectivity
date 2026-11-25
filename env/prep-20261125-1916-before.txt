@@ -1,0 +1,41 @@
+﻿# before 2026-11-25T19:16:52.0223174+09:00 DESKTOP-053T952
+== 전원 구성표
+전원 구성표 GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c  (고성능)
+== GPU
+pstate, temperature.gpu, utilization.gpu [%], memory.used [MiB], clocks.current.sm [MHz], clocks.current.memory [MHz], power.draw [W]
+P8, 34, 0 %, 465 MiB, 240 MHz, 405 MHz, 22.91 W
+== GPU 를 쓰는 프로세스
+pid, process_name, used_gpu_memory [MiB]
+2304, C:\Windows\System32\dwm.exe, [N/A]
+33536, C:\Windows\System32\ShellHost.exe, [N/A]
+32836, C:\Windows\SystemApps\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\CrossDeviceResume.exe, [N/A]
+33332, C:\Windows\explorer.exe, [N/A]
+36780, C:\Windows\SystemApps\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\SearchHost.exe, [N/A]
+36872, C:\Windows\SystemApps\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\StartMenuExperienceHost.exe, [N/A]
+32176, C:\Program Files (x86)\Microsoft\EdgeWebView\Application\157.0.4341.60\msedgewebview2.exe, [N/A]
+41392, C:\Windows\SystemApps\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\TextInputHost.exe, [N/A]
+43252, C:\Windows\SystemApps\ShellExperienceHost_cw5n1h2txyewy\ShellExperienceHost.exe, [N/A]
+43764, C:\Program Files\Riot Vanguard\vgtray.exe, [N/A]
+39252, C:\Windows\System32\ApplicationFrameHost.exe, [N/A]
+42308, C:\Windows\ImmersiveControlPanel\SystemSettings.exe, [N/A]
+88164, C:\Program Files\AMD\CNext\CNext\AMDRSSrcExt.exe, [N/A]
+93040, C:\Program Files\AMD\CNext\CNext\RadeonSoftware.exe, [N/A]
+97196, C:\Program Files\WindowsApps\Microsoft.YourPhone_1.26101.118.0_x64__8wekyb3d8bbwe\PhoneExperienceHost.exe, [N/A]
+== CPU 시간 상위 15 (Windows 기본 프로세스 제외)
+nvcontainer                  cpu= 6,560.0s  ws=    20MB  C:\Program Files\NVIDIA Corporation\NvContainer\nvcontainer.exe
+vgtray                       cpu= 1,079.3s  ws=     7MB  C:\Program Files\Riot Vanguard\vgtray.exe
+nvcontainer                  cpu=   770.5s  ws=    64MB  C:\Program Files\NVIDIA Corporation\NvContainer\nvcontainer.exe
+atkexComSvc                  cpu=   691.3s  ws=     4MB  C:\Program Files (x86)\ASUS\AXSP\5.00.06\atkexComSvc.exe
+tailscaled                   cpu=   242.0s  ws=    49MB  C:\Program Files\Tailscale\tailscaled.exe
+nvcontainer                  cpu=   218.6s  ws=     6MB  C:\Program Files\NVIDIA Corporation\NvContainer\nvcontainer.exe
+nvcontainer                  cpu=   206.9s  ws=    16MB  C:\Program Files\NVIDIA Corporation\NvContainer\nvcontainer.exe
+tailscaled                   cpu=    99.6s  ws=    20MB  C:\Program Files\Tailscale\tailscaled.exe
+msedgewebview2               cpu=    95.8s  ws=    37MB  C:\Program Files (x86)\Microsoft\EdgeWebView\Application\157.0.4341.60\msedgewebview2.exe
+AMDInstallManager            cpu=    77.0s  ws=     8MB  C:\Program Files\AMD\AMDInstallManager\AMDInstallManager.exe
+msedgewebview2               cpu=    58.6s  ws=    10MB  C:\Program Files (x86)\Microsoft\EdgeWebView\Application\157.0.4341.60\msedgewebview2.exe
+msedgewebview2               cpu=    17.2s  ws=     9MB  C:\Program Files (x86)\Microsoft\EdgeWebView\Application\157.0.4341.60\msedgewebview2.exe
+RadeonSoftware               cpu=    15.3s  ws=    45MB  C:\Program Files\AMD\CNext\CNext\Radeonsoftware.exe
+KakaoTalk                    cpu=    13.7s  ws=    17MB  C:\Program Files\Kakao\KakaoTalk\KakaoTalk.exe
+CrossDeviceService           cpu=     9.6s  ws=     8MB  C:\Program Files\WindowsApps\MicrosoftWindows.CrossDevice_1.26101.77.0_x64__cw5n1h2txyewy\CrossDeviceService.exe
+== 메모리
+사용 가능 25.2GB / 전체 31.2GB

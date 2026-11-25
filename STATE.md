@@ -45,6 +45,8 @@
 | 2026-11-25 | PyTorch `2.15.0+cu132` 로 고정 (본체 드라이버 616.92 = CUDA 13.4 지원, RTX 50 은 CUDA 12.8 이상 필요) | 기획서 §14 "RTX 50 지원 확인 후 고정", `env/hw-20261125.md` |
 | 2026-11-25 | 환경은 `env/create-critconn.ps1` 로 만든다 (conda-forge 만, 환경 `.condarc` 고정). conda-forge 패키지 버전도 설치 값으로 고정 | `conda env create` 가 defaults 채널 이용약관에서 멈춤 (`env/install-critconn-20261125-try1.log`) |
 | 2026-11-25 | 본체 push 는 저장소 전용 deploy key + `core.sshCommand` | 운영 규칙 5절, strata-local-llm 과 같은 방식 |
+| 2026-11-25 | `main` 보호: ruleset `main-history`(삭제 · force push 금지, 예외 없음), `main-ci`(CI 필수, 관리자 · deploy key 예외) | 문서 · 환경 작업의 `main` 직접 커밋 허용(CONTRIBUTING 1절)과 양립 — docs/ENVIRONMENT.md 7절 |
+| 2026-11-25 | 노트북에도 `critconn` 을 둔다 (커밋 훅 전체 검사용, 학습은 본체) | 노트북 훅이 python 없이 제목 · 경로만 검사하고 있었음 |
 
 ## 열린 질문
 
@@ -57,6 +59,7 @@
 | 5 | 사전등록 이후 `src/analysis/` 변경에 `Deviation:` 트레일러를 훅으로 강제할지 | 강제 (RULES 4 가 지금은 사람 확인뿐) | Gate 2.5 | 운영 규칙 원칙 3 |
 | 6 | 라이선스 | 미정 — 없으면 공개 저장소라도 재사용 권한이 없다 | 외부 공개 · 인용 | 기획서 §22.1-4, §27.3 (GPL RFM 코드 사용 여부와 연동) |
 | 7 | 기획서 원본 위치: 이 저장소로 옮기고 이후 수정은 여기서만 | 저장소로 옮김 (단일 출처) | 기획서 개정 | 운영 규칙 원칙 1 |
+| 8 | 측정 전 종료 목록 (`env/prep-stop-list.txt`) | 후보: `RadeonSoftware` · `AMDRSSrcExt` (AMD 내장 그래픽 소프트웨어), `KakaoTalk`, `PhoneExperienceHost`. Riot Vanguard · NVIDIA · Tailscale(원격 접속) 은 제외 | Gate 1 처리량 실측 | `env/prep-20261125-1916-before.txt` (전원 구성표는 이미 고성능) |
 
 ## 에이전트 사용
 
@@ -65,5 +68,6 @@
 
 ## 최근 변경
 
+- 2026-11-25 · Claude Code · 노트북 `critconn` 설치(.ps1 BOM 문제 수정) · `main` ruleset 2개 · `env/prep-measure.ps1` 과 본체 기록(기록만, `-Apply` 안 함) · 원격 실행 문서화 · 노트북 · 본체 `verify.ps1` 통과(테스트 16)
 - 2026-11-25 · Claude Code · 본체 클론 · deploy key 등록 · `critconn` 설치(시도 3회: defaults 이용약관 → CPU torch → cu132 성공) · 하드웨어 실측 · 본체 `verify.ps1` 통과(ruff · 포맷 · 테스트 15 · 원장)
 - 2026-11-25 · Claude Code · 저장소 기본 세팅(뼈대 · 훅 · CI · 템플릿 · 기획서 v0.4 이관) · 훅 단위 테스트 · ruff · 원장 검사 통과 (노트북, uv 임시 환경)
