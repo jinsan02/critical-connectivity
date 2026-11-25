@@ -57,9 +57,13 @@ tail -n 15 experiments/LEDGER.tsv
 powershell -NoProfile -ExecutionPolicy Bypass -File env\create-critconn.ps1
 # 검증 — 커밋 전에
 powershell -NoProfile -ExecutionPolicy Bypass -File verify.ps1
+# 처리량 측정 전 — 기록만 (-Apply 는 사람에게 묻고)
+powershell -NoProfile -ExecutionPolicy Bypass -File env\prep-measure.ps1
 ```
 
-인터프리터는 절대경로(`C:\ProgramData\anaconda3\envs\critconn\python.exe`)로 부른다.
+- 인터프리터는 절대경로로 부른다. 본체 `C:\ProgramData\anaconda3\envs\critconn\python.exe`, 노트북 `%USERPROFILE%\anaconda3\envs\critconn\python.exe`.
+- 실험은 본체에서 돈다. 노트북에서는 `ssh desktop-5070` 으로 다룬다 — 방법과 함정은 `docs/ENVIRONMENT.md` 6절.
+- `.ps1` 은 UTF-8 BOM 으로 저장한다 (테스트가 검사).
 
 ## 8. 긴 작업
 

@@ -51,4 +51,33 @@ git config user.email <GitHub 계정 이메일>
 
 ## 5. 정리 · 측정 조건
 
-측정 전 정리(백그라운드 앱 종료, 전원 구성표)는 스크립트로 고정하고 효과를 `env/` 에 기록한다. 처리량 비교는 같은 날 · 같은 상태에서 교차로 잰다.
+측정 전 정리는 [`env/prep-measure.ps1`](../env/prep-measure.ps1) 로 한다. 처리량 비교는 같은 날 · 같은 상태에서 교차로 잰다.
+
+| 명령 | 하는 일 |
+| --- | --- |
+| `env\prep-measure.ps1` | 기록만 — 전원 구성표 · GPU 상태 · 상주 프로그램 상위 15 · 메모리를 `env/prep-<시각>-before.txt` 에 |
+| `env\prep-measure.ps1 -Apply` | 전원 구성표 '고성능' + `env/prep-stop-list.txt` 의 프로세스 종료 → `-after.txt` |
+| `env\prep-measure.ps1 -Restore` | 적용 전 전원 구성표로 되돌림 |
+
+- `-Apply` 는 시스템 설정을 바꾸므로 에이전트는 사람에게 묻고 쓴다.
+- 종료 목록은 처음에 비어 있다. 기록을 보고 사람이 채운다. 안티치트 · 드라이버 서비스는 넣지 않는다.
+- 처리량을 잰 run 은 원장 `note` 에 해당 `prep-*` 파일 이름을 적는다.
+
+## 6. 원격 실행 (노트북 → 본체)
+
+에이전트는 노트북에서 SSH 로 본체를 다룬다. 접속 별칭은 `desktop-5070`(Tailscale)이다. 주소는 각 PC 의 `~/.ssh/config` 에만 두고 저장소에 쓰지 않는다.
+
+- 본체의 기본 셸은 cmd 다. 여러 줄 PowerShell 은 UTF-16LE base64 로 인코딩해 `powershell -NoProfile -EncodedCommand <b64>` 로 보낸다. 공백 있는 경로를 인자 배열로 넘기지 않는다.
+- 긴 작업(설치 · 학습)은 출력을 본체의 로그 파일로 보내고, 노트북은 백그라운드로 기다린다. 끝난 뒤 로그를 읽는다.
+- PowerShell 5.1 의 `*>>` 리디렉션은 UTF-16 으로 쓴다. 로그는 `2>&1 | ForEach-Object { "$_" } | Out-File -Append -Encoding utf8` 로 남긴다.
+- `.ps1` 파일은 **UTF-8 BOM** 으로 저장한다. BOM 이 없으면 시스템 코드 페이지가 CP949 인 PC(노트북)의 PowerShell 5.1 이 한국어를 잘못 읽어 구문 오류가 난다. `tests/test_hooks.py` 가 검사한다.
+- 본체에서 커밋 · push 할 때는 본체의 훅(전체 Python 검사)과 deploy key(4절)를 쓴다. 노트북에서 고친 파일을 `scp` 로 덮어쓴 뒤 본체에서 커밋할 수도 있다.
+
+## 7. 저장소 보호 (GitHub ruleset)
+
+| ruleset | 규칙 | 예외 |
+| --- | --- | --- |
+| `main-history` | `main` 삭제 · force push 금지 | 없음 |
+| `main-ci` | `main` 에 들어가는 커밋은 CI(`check`) 통과 필요 | 저장소 관리자 · deploy key (문서 · 환경 작업의 `main` 직접 커밋용, CONTRIBUTING 1절) |
+
+PR 은 CI 가 초록이어야 머지한다. 예외 권한으로 실패한 PR 을 머지하지 않는다.

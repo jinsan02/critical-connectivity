@@ -39,7 +39,7 @@ type · scope · 트레일러 · 예시는 [`docs/COMMIT_CONVENTION.md`](docs/CO
 
 - 템플릿의 확인 항목을 채운다. 돌린 명령과 결과를 그대로 쓴다. 못 돌렸으면 못 돌렸다고 쓴다.
 - 머지는 **Merge commit**. `record` 커밋과 코드 커밋을 따로 남겨야 하므로 squash 하지 않는다.
-- force push 는 사람 승인을 받은 경우에만.
+- force push 는 사람 승인을 받은 경우에만. `main` 은 ruleset 으로 삭제 · force push 가 막혀 있고, PR 은 CI 통과가 필요하다 ([`docs/ENVIRONMENT.md`](docs/ENVIRONMENT.md) 7절).
 
 CI(`.github/workflows/ci.yml`)는 push · PR 마다 GPU 없이 돈다: ruff 린트 · 포맷 → 테스트 → 원장 무결성 → 범위 안 모든 커밋 메시지.
 
