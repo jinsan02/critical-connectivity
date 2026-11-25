@@ -97,3 +97,14 @@ def test_ledger_append_only():
 
 def test_committed_ledger_is_valid():
     assert validate_ledger.validate(ROOT) == []
+
+
+def test_ps1_have_utf8_bom():
+    # Windows PowerShell 5.1 은 BOM 없는 .ps1 을 시스템 코드 페이지(CP949)로 읽어
+    # 한국어 주석·문자열에서 구문 오류가 난다 (2026-11-25 노트북에서 실제로 일어남).
+    no_bom = [
+        str(p.relative_to(ROOT))
+        for p in ROOT.rglob("*.ps1")
+        if ".venv" not in p.parts and not p.read_bytes().startswith(b"\xef\xbb\xbf")
+    ]
+    assert no_bom == [], f"UTF-8 BOM 으로 저장하라: {no_bom}"

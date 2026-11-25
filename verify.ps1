@@ -1,4 +1,4 @@
-# 커밋 전 전체 검증 — 린트 → 포맷 → 테스트 → 원장 → push 안 한 커밋의 메시지
+﻿# 커밋 전 전체 검증 — 린트 → 포맷 → 테스트 → 원장 → push 안 한 커밋의 메시지
 # 사용: powershell -NoProfile -ExecutionPolicy Bypass -File verify.ps1
 $ErrorActionPreference = 'Continue'
 Set-Location $PSScriptRoot

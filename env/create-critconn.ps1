@@ -1,4 +1,4 @@
-# critconn 환경을 env/critconn.yml 대로 만든다 (docs/ENVIRONMENT.md 2절).
+﻿# critconn 환경을 env/critconn.yml 대로 만든다 (docs/ENVIRONMENT.md 2절).
 #
 # conda env create 는 채널 덮어쓰기 옵션이 없어서, 본체 conda 설정의 defaults 채널
 # (이용약관 동의 필요)을 피할 수 없다. 그래서 yml 을 읽어 conda create
@@ -8,8 +8,13 @@
 # 사용: powershell -NoProfile -ExecutionPolicy Bypass -File env\create-critconn.ps1
 $ErrorActionPreference = 'Stop'
 Set-Location (Split-Path $PSScriptRoot -Parent)
-$conda = 'C:\ProgramData\anaconda3\Scripts\conda.exe'
-$envDir = 'C:\ProgramData\anaconda3\envs\critconn'
+# 본체는 C:\ProgramData\anaconda3, 노트북은 사용자 폴더의 anaconda3
+$root = @('C:\ProgramData\anaconda3', (Join-Path $env:USERPROFILE 'anaconda3')) |
+  Where-Object { Test-Path (Join-Path $_ 'Scripts\conda.exe') } | Select-Object -First 1
+if (-not $root) { throw 'anaconda3 를 찾지 못했다' }
+$conda = Join-Path $root 'Scripts\conda.exe'
+$envDir = Join-Path $root 'envs\critconn'
+Write-Host "anaconda: $root"
 
 $condaPkgs = @(); $pipArgs = @(); $inDeps = $false; $inPip = $false
 foreach ($line in Get-Content env\critconn.yml) {
