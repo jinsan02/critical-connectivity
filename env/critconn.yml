@@ -3,6 +3,7 @@
 name: critconn
 channels:
   - conda-forge
+  - nodefaults  # 기본 채널(defaults)은 이용약관 동의가 필요하다
 dependencies:
   - python=3.12
   - numpy
