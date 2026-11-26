@@ -1,0 +1,20 @@
+# Cross-Model Layer Network — 블록 풀 8×8, 학습 Router Top-1 시퀀스 라우팅 (§5.4~§5.6)
+name: cross_model
+id: CM
+kind: cross_model
+d_model: 288
+n_layers: 8
+n_chains: 8
+n_heads: 4
+d_ff: 1152
+norm: pre_ln
+act: gelu
+init_std: 0.02
+adapter_rank: 16 # 교차 간선 Adapter 288→16→288, 간선당 9,216
+density: 1.0 # 교차 간선 밀도 ρ — 실험에서 바꾼다 (EXP-02)
+mask_seed: 0 # 중첩 마스크 순서 (§12A-5) — 실험에서 바꾼다
+router: learned
+top_k: 1
+lb_coef: 0.01 # Load Balancing (§5.6)
+z_coef: 0.001 # Router z-loss (§5.6)
+design_params: 63700992 # 12·d²·L·n_chains (블록 풀)

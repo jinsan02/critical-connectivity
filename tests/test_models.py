@@ -19,6 +19,10 @@ PLAN_TABLE = {
     "dense_64m": 63_700_992,
     "dense_64m_8l": 63_922_176,
     "ensemble_8x8m": 63_700_992,
+    "parallel_mixing": 63_700_992,
+    "cross_model": 63_700_992,
+    "cross_model_hash": 63_700_992,
+    "cross_model_random": 63_700_992,
 }
 
 
@@ -113,7 +117,8 @@ def test_ensemble_averages_chains():
 @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA 없음 (CI)")
 @pytest.mark.parametrize("name", sorted(PLAN_TABLE))
 def test_cuda_bf16_forward_backward(name):
-    m = build_model(cfg(name), P, device="cuda")
+    c = cfg(name)
+    m = build_model(c, P, device="cuda")
     x = tokens(256).cuda()
     y = torch.randint(0, P, (256,), device="cuda")
     with torch.autocast("cuda", dtype=torch.bfloat16):
@@ -122,4 +127,11 @@ def test_cuda_bf16_forward_backward(name):
     loss = nn.functional.cross_entropy(logits, y)
     loss.backward()
     assert torch.isfinite(loss)
-    assert all(p.grad is not None for p in m.parameters())
+    if c.get("kind") == "cross_model":
+        # Top-1 경로라 배치에 안 쓰인 블록 · Adapter 는 기울기가 없다. 초기 Router 는 확률이
+        # 거의 균등해도 argmax 가 몇 블록에 몰린다 (공통 `=` 토큰 · 위치 임베딩). 층마다 하나 이상.
+        assert m.embed.tok.weight.grad is not None and m.head.unembed.weight.grad is not None
+        for layer in range(c["n_layers"]):
+            assert any(ch[layer].mlp.fc_out.weight.grad is not None for ch in m.chains), layer
+    else:
+        assert all(p.grad is not None for p in m.parameters())
