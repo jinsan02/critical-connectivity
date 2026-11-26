@@ -1,4 +1,4 @@
-# R1 재현 앵커 — [8] 설정 그대로 (기획서 v0.5 §5.8). 데이터: configs/data/r1_add113.yaml
+# R1 재현 앵커 — [8] 설정 그대로 (기획서 v0.6 §5.8). 데이터: configs/data/r1_add113.yaml
 name: r1
 id: R1
 kind: dense

@@ -18,6 +18,7 @@
 
 | # | 날짜 | 제목 | 영역 | 상태 |
 | --- | --- | --- | --- | --- |
+| T-009 | 11-26 | Cross-Model 학습 스텝이 Dense-64M 보다 약 8배 느림 (간이 측정) | conn · model | 조치 중 |
 | T-008 | 11-26 | `.gitignore` 의 `data/` 가 `configs/data/` 까지 숨겨 분할 설정이 커밋되지 않음, CI 해시 테스트는 건너뜀 | data · infra | 해결 (6c71bf7, PR #2) |
 | T-007 | 11-26 | verify 가 멀쩡한 커밋 메시지를 거부 (PowerShell 파이프가 한국어를 깨뜨림) | infra | 해결 (ca35298) |
 | T-006 | 11-25 | 노트북 PowerShell 5.1 이 BOM 없는 `.ps1` 을 CP949 로 읽어 구문 오류 | env · infra | 해결 (a9a6fdf, 테스트) |
@@ -45,6 +46,27 @@
 ```
 
 ---
+
+## T-009 Cross-Model 학습 스텝이 Dense-64M 보다 약 8배 느림 (간이 측정)
+- 날짜 · 단계 · 영역: 11-26 · G1 · conn · model
+- 상태: 조치 중 — Gate 1 벤치마크(STATE 다음 할 일 3)에서 공식 측정 후 줄인다
+### 발생 로그
+PR #4 검증 중 본체(RTX 5070 Ti)에서 잰 간이 측정. B=512, bf16 autocast, AdamW, 워밍업 5 스텝 뒤 20 스텝 평균, 측정 준비(`prep-measure`) 없음:
+`dense_64m 33.5 · ensemble_8x8m 65.4 · parallel_mixing 140.2 · cross_model 257.2 ms/step`
+### 상황 분석
+- Cross-Model 은 표본마다 다른 블록을 고르므로 층마다 블록별로 표본을 모아 계산한다. `torch.unique(...).tolist()` 와 `nonzero` 가 층마다 GPU 동기화를 부르고, 작은 블록 호출이 층당 최대 8번, 교차 Adapter 호출이 층당 최대 56번 생긴다.
+- Parallel-Mixing 은 ρ=100% 에서 간선 392개의 Adapter 를 하나씩 순서대로 계산한다.
+- 둘 다 계산량보다 커널 호출 · 동기화가 시간을 쓰는 것으로 보인다(프로파일링 전 추정).
+### 영향
+- 기획서 §15.1 의 Cross-Model 실행 시간 추정이 낙관적일 수 있다. Core 503회 일정과 동시 실행 수가 바뀔 수 있다.
+- 정확도 · 결과에는 영향이 없다 (테스트 95개 통과).
+### 개선 · 조치
+아직 정하지 않았다. 방향은 사람과 토의해서 정한다.
+- Gate 1 벤치마크에서 `torch.profiler` 로 원인을 나눈다.
+- 후보: 블록 풀 가중치를 쌓아 묶음 행렬곱(`bmm`) · 정렬 후 분배로 동기화 줄이기, Adapter 를 층별로 쌓아 한 번에 계산, `torch.compile`.
+- 바꾼 뒤에는 현재 구현과 출력이 같은지 테스트로 묶는다 (`upgrade` 커밋).
+### 재발 방지
+- 새 아키텍처는 테스트 통과와 함께 1 스텝 시간을 같이 재서 PR 에 적는다.
 
 ## T-008 `.gitignore` 의 `data/` 가 `configs/data/` 까지 숨겨 분할 설정이 커밋되지 않음
 - 날짜 · 단계 · 영역: 11-26 · G1 · data · infra

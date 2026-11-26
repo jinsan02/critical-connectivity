@@ -1,4 +1,4 @@
-"""모델 설정별 파라미터 수를 설계값과 대조해 표로 출력한다 (Gate 1, 기획서 v0.5 §5.8).
+"""모델 설정별 파라미터 수를 설계값과 대조해 표로 출력한다 (Gate 1, 기획서 v0.6 §5.8).
 
     python scripts/count_params.py              # configs/model/*.yaml 전부, p=97
     python scripts/count_params.py --p 113 configs/model/r1.yaml
