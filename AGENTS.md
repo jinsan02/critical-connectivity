@@ -30,6 +30,7 @@ tail -n 15 experiments/LEDGER.tsv
 | 커밋 · 브랜치 · 태그 | `docs/COMMIT_CONVENTION.md` | `tools/check_commit_msg.py` 가 집행 |
 | 원장 열 | `docs/LEDGER_SCHEMA.md` | `tools/validate_ledger.py` 와 같아야 한다 |
 | 환경 | `docs/ENVIRONMENT.md`, `env/critconn.yml` | |
+| 문제 · 삽질 기록 | `docs/TROUBLESHOOTING.md` (T-NNN), `docs/COLLAB-LOG.md` (C-NNN) | 생긴 날 바로 쓴다 |
 | 지난 기획서 v0.1~v0.3 | 저장소에 두지 않는다 | 변경 이력은 v0.4 첫머리 요약 |
 
 ## 4. 폴더
@@ -93,3 +94,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File env\prep-measure.ps1
 3. 새로 정한 것은 `STATE.md` 결정 기록 + 해당 기준 문서에 쓴다.
 4. 결과는 원장에 남기고 커밋한다. 커밋되지 않은 결과는 없는 결과다.
 5. `git status` 를 깨끗하게 두거나, 남긴 이유를 적는다.
+
+- 시스템 문제(환경 · 도구 · 코드 버그 · 데이터)가 생기면 `docs/TROUBLESHOOTING.md` 에 발생 로그 · 상황 분석 · 영향 · 개선 · 재발 방지를 한 건씩 남긴다. 해결 방향이 사용자 판단을 요하면 토의해 정하고, 그전까지 상태는 '토의 필요'.
+- 사람과 AI 에이전트가 같이 일하다 생긴 헛수고 · 잘못된 가설 · 소통 어긋남 · 도구 실수는 `docs/COLLAB-LOG.md` 에 남긴다. AI 의 실수와 정정, 사용자가 지적한 어긋남도 숨기지 않고 쓴다.
+- 둘 다 **생긴 날 바로** 쓴다. 몰아 쓰면 오류 원문과 경위가 사라진다. 측정 중이면 추적 경로 밖에 적어 두었다가 측정 뒤 커밋한다.

@@ -76,6 +76,7 @@
 
 ## 최근 변경
 
+- 2026-11-26 · Claude Code · 문제 · 삽질 기록 체계 도입 (strata-local-llm 방식): `docs/TROUBLESHOOTING.md` T-001~008, `docs/COLLAB-LOG.md`(사람 + AI 에이전트) C-001~009 를 지금까지 일로 소급 작성, AGENTS §3 · §11 에 '생긴 날 바로 쓴다' 규칙
 - 2026-11-26 · Claude Code · Dense 계열 모델 R1 · B-1~B-4 + 파라미터 계수 · 결정적 초기화 · FP32 로짓 · 인과 마스크 테스트 (`feat/model-dense`), CI 에 CPU PyTorch 추가, 본체 CUDA bf16 테스트 통과
 - 2026-11-26 · Claude Code · **정정:** 지난 보고의 "CI 에서 분할 해시 재현"은 틀렸다. `.gitignore` 의 `data/` 가 `configs/data/` 를 숨겨 설정이 커밋되지 않았고 해시 테스트는 건너뛰어졌다. 6c71bf7 로 설정을 커밋하고 패턴을 루트 고정(`/data/` `/checkpoints/` `/runs/` `/build/`)으로 바꿨으며 회귀 테스트를 더했다
 - 2026-11-26 · Claude Code · 데이터 생성 · 분할 · 해시 · 숫자 빈도 (`feat/data-modular`), verify 커밋 검사 수정 · 노트북 verify 통과(테스트 32)
