@@ -209,10 +209,17 @@ def main(argv=None) -> int:
     source = "index" if "--staged" in args else "worktree"
     args = [a for a in args if a != "--staged"]
     if not args:
-        print("usage: check_commit_msg.py [--staged] <COMMIT_MSG_FILE>", file=sys.stderr)
+        print(
+            "usage: check_commit_msg.py [--staged] <COMMIT_MSG_FILE> | --commit <SHA>",
+            file=sys.stderr,
+        )
         return 2
-    # utf-8-sig: Windows PowerShell 5.1 의 Out-File 이 붙이는 BOM 을 떼어 낸다.
-    message = Path(args[0]).read_text(encoding="utf-8-sig", errors="replace")
+    if args[0] == "--commit" and len(args) > 1:
+        # git 에서 바로 UTF-8 로 읽는다. PowerShell 5.1 파이프는 한국어를 깨뜨린다.
+        message = repo.git("log", "-1", "--format=%B", args[1], root=repo.repo_root())
+    else:
+        # utf-8-sig: Windows PowerShell 5.1 의 Out-File 이 붙이는 BOM 을 떼어 낸다.
+        message = Path(args[0]).read_text(encoding="utf-8-sig", errors="replace")
     # CI(worktree)는 커밋된 트리를 보므로 스테이지 목록이 없다.
     errors = check(message, source=source, staged=None if source == "index" else [])
     if not errors:
