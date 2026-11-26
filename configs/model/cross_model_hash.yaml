@@ -1,0 +1,18 @@
+# B-6 Cross-Model + 해시 고정 Router — (a·31+b) mod 허용 수, 학습 파라미터 0 (§5.6, §12A-2)
+name: cross_model_hash
+id: B-6
+kind: cross_model
+d_model: 288
+n_layers: 8
+n_chains: 8
+n_heads: 4
+d_ff: 1152
+norm: pre_ln
+act: gelu
+init_std: 0.02
+adapter_rank: 16 # 교차 간선 Adapter 288→16→288, 간선당 9,216
+density: 1.0 # 교차 간선 밀도 ρ — 실험에서 바꾼다 (EXP-02)
+mask_seed: 0 # 중첩 마스크 순서 (§12A-5) — 실험에서 바꾼다
+router: hash
+top_k: 1
+design_params: 63700992 # 12·d²·L·n_chains (블록 풀)

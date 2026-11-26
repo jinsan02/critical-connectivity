@@ -1,4 +1,4 @@
-"""모델 (기획서 v0.5 §5). Cross-Model · Parallel-Mixing 은 src/connectivity 와 함께 들어온다."""
+"""모델 (기획서 v0.5 §5). Router · Adapter · 마스크는 src/connectivity."""
 
 from src.models.build import (
     build_model,
@@ -8,14 +8,19 @@ from src.models.build import (
     param_breakdown,
     weight_norm,
 )
+from src.models.cross_model import CrossModel, RouteInfo
 from src.models.dense import DenseTransformer
 from src.models.ensemble import Ensemble
+from src.models.parallel_mixing import ParallelMixing
 from src.models.transformer import BlockConfig
 
 __all__ = [
     "BlockConfig",
+    "CrossModel",
     "DenseTransformer",
     "Ensemble",
+    "ParallelMixing",
+    "RouteInfo",
     "build_model",
     "check_design",
     "design_params",
