@@ -20,7 +20,8 @@ critical-connectivity/
 ├─ docs/
 │  ├─ RULES.md                 하드룰 — 규칙의 단일 출처
 │  ├─ COMMIT_CONVENTION.md · WORKFLOW.md · ENVIRONMENT.md · LEDGER_SCHEMA.md
-│  └─ plan/                    기준 기획서 v0.4 + 조사 문서
+│  ├─ TROUBLESHOOTING.md · COLLAB-LOG.md   시스템 문제 T-NNN · 협업 삽질 C-NNN
+│  └─ plan/                    기준 기획서 v0.5 + 조사 문서
 ├─ env/                        conda 선언 · 설치 로그 · 하드웨어 실측
 ├─ configs/                    (예정) 실험 설정 YAML
 ├─ src/                        (예정) datasets · models · connectivity · training · analysis
