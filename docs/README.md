@@ -9,7 +9,7 @@
 | 원장 열 | [`LEDGER_SCHEMA.md`](LEDGER_SCHEMA.md) |
 | 무엇이 왜 고장 났고 어떻게 고쳤나 | [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md) (T-NNN) |
 | 사람 + AI 에이전트 협업 삽질 (velog 재료) | [`COLLAB-LOG.md`](COLLAB-LOG.md) (C-NNN) |
-| 무엇을 만드나 (기준 기획서) | [`plan/research_plan_v0.5.md`](plan/research_plan_v0.5.md) |
+| 무엇을 만드나 (기준 기획서) | [`plan/research_plan_v0.6.md`](plan/research_plan_v0.6.md) |
 | 데이터셋 조사 | [`plan/dataset_search_modular.md`](plan/dataset_search_modular.md) |
 | 2025~2026 신규성 검색 | [`plan/novelty_search_2025_2026.md`](plan/novelty_search_2025_2026.md) |
 | 참고문헌 검증 (v0.2) | [`plan/reference_verification_v0.2.md`](plan/reference_verification_v0.2.md) |

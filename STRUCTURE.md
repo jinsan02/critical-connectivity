@@ -2,7 +2,7 @@
 
 ## 1. 읽는 순서
 
-- **사람:** `README.md` → `STATE.md` → `docs/plan/research_plan_v0.5.md` §1~§3 → `CONTRIBUTING.md`
+- **사람:** `README.md` → `STATE.md` → `docs/plan/research_plan_v0.6.md` §1~§3 → `CONTRIBUTING.md`
 - **AI 에이전트:** `AGENTS.md` 2절 순서 (`STATE` → `STRUCTURE` → `docs/RULES` → 폴더 `README`·`AGENTS` → 기준 문서 해당 절)
 
 ## 2. 폴더 트리
@@ -21,7 +21,7 @@ critical-connectivity/
 │  ├─ RULES.md                 하드룰 — 규칙의 단일 출처
 │  ├─ COMMIT_CONVENTION.md · WORKFLOW.md · ENVIRONMENT.md · LEDGER_SCHEMA.md
 │  ├─ TROUBLESHOOTING.md · COLLAB-LOG.md   시스템 문제 T-NNN · 협업 삽질 C-NNN
-│  └─ plan/                    기준 기획서 v0.5 + 조사 문서
+│  └─ plan/                    기준 기획서 v0.6 + 조사 문서
 ├─ env/                        conda 선언 · 설치 로그 · 하드웨어 실측
 ├─ configs/                    data · model 설정 YAML (experiments 는 예정)
 ├─ src/                        datasets · models · connectivity (training · analysis 는 예정)

@@ -6,7 +6,7 @@
 - 주 과제는 모듈러 덧셈 $a+b \bmod 97$ (9,409쌍, 입력 `a b =`)입니다.
 - 주 가설: 교차 연결 밀도 ρ 에 따른 Grokking 확률 · 시점 곡선에 변화점이 있다(H3), 유효 연결량 $C_{\mathrm{eff}}$ 가 기존 예측식을 넘는 설명력을 가진다(H2).
 
-설계 전체는 [`docs/plan/research_plan_v0.5.md`](docs/plan/research_plan_v0.5.md) 에 있습니다.
+설계 전체는 [`docs/plan/research_plan_v0.6.md`](docs/plan/research_plan_v0.6.md) 에 있습니다.
 
 ## 현재 상태
 
