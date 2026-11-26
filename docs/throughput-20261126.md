@@ -63,7 +63,37 @@ Gate 1 처리량 벤치마크의 **예비 측정**이다. 측정 전 백그라�
 
 (실행 × 스텝/초) 작은 모델만 이득이 있다. 64M급은 한 실행이 GPU 를 채운다.
 
-## 5. 결론 · 운영 기준 (기획서 §15.1 운영 규칙 갱신)
+## 5. 자원 사용 (1 프로세스, 2026-11-26 측정)
+
+**VRAM** — Windows(WDDM)에서는 nvidia-smi 가 프로세스별 VRAM 을 `N/A` 로 보여 준다. 그래서 실행 중 GPU 전체 사용량의 최댓값에서 대기 상태(565 MiB)를 뺐다. CUDA 컨텍스트(약 0.4GB)가 포함된 값이다. 2절의 `max_memory_allocated` 는 PyTorch 텐서만 센 값이라 이보다 작다.
+
+| 모델 | 배치 256 (기본) | 배치 512 |
+| --- | ---: | ---: |
+| R1 | 0.43 GB | 0.45 GB |
+| Dense-8M | 0.66 GB | 0.76 GB |
+| Dense-64M-8L | 1.77 GB | 1.90 GB |
+| Dense-64M | 1.90 GB | 2.10 GB |
+| Ensemble 8×8M | 2.26 GB | 2.94 GB |
+| Cross-Model | 2.34 GB | 2.98 GB |
+| Parallel-Mixing | 2.87 GB | 4.03 GB |
+
+64M급 VRAM 의 절반쯤은 학습 상태(파라미터 · 기울기 · AdamW 상태 2개, FP32 로 파라미터당 16바이트 → 약 1.0~1.1GB)다.
+
+**RAM · CPU · GPU** (같은 실행, 측정 창 중간에 2초 샘플)
+
+| 항목 | 값 | 비고 |
+| --- | --- | --- |
+| RAM (작업 집합) | 1.5~2.2 GB | R1 · Dense-8M 1.5, Dense-64M 1.7, Parallel-Mixing 1.9, Cross-Model 2.2 |
+| CPU | 논리 코어 24개 중 1.3~4.2% (약 코어 1개) | CUDA Graph 로 CPU 할 일이 거의 없다 |
+| GPU 사용률 (nvidia-smi) | 모든 모델 98~100% | 커널이 돌고 있던 시간 비율이라 R1 도 100% 다. 연산 유닛을 얼마나 채웠는지는 아니다 |
+
+**Seed 묶음 VRAM** (4절, `max_memory_allocated` 기준이라 실제는 약 0.4GB 더 크다): R1 K=40 0.4GB · Dense-8M K=8 1.8GB · Cross-Model K=4 7.6GB · Parallel-Mixing K=4 9.6GB.
+
+**분석용 체크포인트 1개 (BF16 가중치, 파라미터 수로 계산)**: 64M급 약 130MB · Dense-8M 약 16MB · R1 약 0.5MB.
+
+정리: VRAM 은 가장 큰 모델도 16GB 의 4분의 1 이하라 여유가 크다. 실제 한계는 GPU 연산 시간이다.
+
+## 6. 결론 · 운영 기준 (기획서 §15.1 운영 규칙 갱신)
 
 1. 64M급(Dense-64M · B-3 · B-4 · B-5 · Cross-Model · B-6)은 **한 번에 하나씩** 돌린다. 동시 실행 · Seed 묶음 이득이 없다.
 2. R1 · Dense-8M 은 한 프로세스 안 Seed 묶음(R1 K=10, Dense-8M K=4~8)이 이득이다.

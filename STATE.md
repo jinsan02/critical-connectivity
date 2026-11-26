@@ -89,6 +89,7 @@
 
 ## 최근 변경
 
+- 2026-11-27 · Claude Code · 처리량 문서에 모델별 자원 사용(VRAM 0.4~4.0GB · RAM 1.5~2.2GB · CPU 약 1코어 · GPU 포화) 추가
 - 2026-11-26 · Claude Code · 학습 스텝 고속화 (`upgrade/fast-step`, T-009 해결): 블록 풀 묶음 계산 · 직접 어텐션 · Router 동기화 제거 → CUDA Graph. Cross-Model 237.7 → 34.4 ms(배치 512), 기본 설정(배치 256)에서 100K 스텝 34분. 동시 실행 · Seed 묶음 실측, 벤치 도구 3개, 기획서 §15.1 예비 실측 반영
 - 2026-11-26 · Claude Code · 정돈: 문서의 기획서 참조를 v0.6 으로, README · AGENTS 현재 단계 · tests · configs · scripts README 갱신, TROUBLESHOOTING T-009(Cross-Model 스텝 시간) 추가, 본체 임시 파일 · 머지된 브랜치 정리
 - 2026-11-26 · Claude Code · 교차 간선 Adapter 를 후보 392개 전부 사전 할당 (§27.2, 열린 질문 9 해소). 막힌 간선은 출력 · 기울기에 영향 없음을 테스트, 파라미터 표에 'Adapter (활성)' 열
