@@ -5,7 +5,7 @@
 ## 지금
 
 - 마지막 갱신: 2026-11-26
-- 단계: **Gate 1 진행 중** — 데이터 · Dense 계열 모델 완료, 다음은 Cross-Model · Parallel-Mixing
+- 단계: **Gate 1 진행 중** — 데이터 · 모델(Dense 계열 · Parallel-Mixing · Cross-Model) 완료, 다음은 1K 스텝 벤치마크
 - 대상 환경: 본체 desktop-5070 (RTX 5070 Ti 16GB, `C:\critical-connectivity`, conda `critconn`) — 실측 `env/hw-20261125.md`
 - 주 실행자: 사람 + Claude Code · Codex
 
@@ -24,8 +24,9 @@
 
 1. ~~`src/datasets/` 모듈러 덧셈 생성 · 분할 + Gate 1 pytest~~ → `feat/data-modular` (해시: `configs/data/*.yaml`, 숫자 빈도 최소/평균 add97 0.75 · r1 0.65, 표시 없음)
 2. ~~모델 Dense 계열(R1 · B-1 · B-2 · B-3 · B-4) + 파라미터 수 ±1% pytest~~ → `feat/model-dense` (표: `scripts/count_params.py`)
-2b. Cross-Model · Parallel-Mixing · Router · Adapter · 마스크 (`feat/conn-cross`) — 열린 질문 8 이 필요
-3. R1 앵커 모델과 1K 스텝 처리량 · VRAM · 동시 수 벤치마크 → 기획서 §15.1 추정표를 실측치로 교체
+2b. ~~Cross-Model · Parallel-Mixing · Router · Adapter · 마스크~~ → `feat/conn-cross` (Adapter 3,612,672 · Router 18,496, `scripts/count_params.py`)
+2c. Top-2 · Top-4 Router (EXP-04 · P4 전), 가지치기 (EXP-05)
+3. R1 앵커 모델과 1K 스텝 처리량 · VRAM · 동시 수 벤치마크 → 기획서 §15.1 추정표를 실측치로 교체. Cross-Model 은 표본별 분배 루프(층마다 GPU 동기화)가 있어 따로 잰다
 4. 원장 열 · run_id 규칙 확정 (열린 질문 2, 3)
 
 ## 사람에게 요청한 것
@@ -57,6 +58,10 @@
 | 2026-11-26 | B-3 Dense-64M-8L 은 12헤드 (헤드 차원 68) | 에이전트 결정 — 기획서에 헤드 수 없음. 다른 모델의 헤드 차원 72 에 가장 가까운 약수. 파라미터 수와 무관 |
 | 2026-11-26 | 초기화: Linear · Embedding N(0, 0.02²), bias 0, LayerNorm (1, 0). CPU 에서 `init_seed` 로 만들고 옮긴다 | 에이전트 결정 (GPT 형 기본값, 파일럿에서 바꿀 수 있음) — 기획서 §15.2 "init_seed 로 재생성", §9 가중치 노름 기록 |
 | 2026-11-26 | 작업 방식: 본체에서 커밋 · push, PR CI 가 통과하면 merge commit 으로 머지까지 | 사람 지시 |
+| 2026-11-26 | Cross-Model 첫 층: 임베딩 평균을 받는 Router 0 을 더한다 (Router 8개, 첫 층은 마스크 없음, 교차 간선 392개 그대로) | 사람 결정 (권장안), 열린 질문 8 해소 — 기획서 §22.1-1 |
+| 2026-11-26 | Cross-Model 층 계산: 교차 이동이면 블록 입력 `h + A(h)`(같은 체인이면 `h`), 게이트는 블록 증분에만 `x + g·(F(x) − x)` | 사람 결정 (권장안) — §5.4 식을 Parallel-Mixing 의 잔차 더하기 · Switch 게이트 [19] 와 맞춰 구현. `g·F(A·h)` 그대로면 16차원 병목과 층마다 g 배 감쇠 |
+| 2026-11-26 | Adapter 는 bias 없음(간선당 2dr = 9,216), Router 는 선형 288→8 bias 있음 · FP32 로짓, 해시 Router 는 허용 블록 중 `(a·31+b) mod 허용 수` 번째(게이트 1), 밀도 → 간선 수는 반올림, 중첩 순서는 numpy PCG64(`mask_seed`) | 에이전트 결정 — §5.7 "약 9.2K · 3.6M" 은 bias 없는 값, 반올림이 §6.2 · EXP-02 표와 일치 |
+| 2026-11-26 | 초기화: 생성 직후 `init_seed` 를 다시 걸고 등록 순서(임베딩 → 체인 → 출력층 → Router → Adapter)로 초기화, Adapter 는 (`init_seed`, 간선 번호) 생성기로 간선별 | 에이전트 결정 — 같은 seed 면 Ensemble · Parallel-Mixing · Cross-Model 공유 부분과 밀도가 다른 중첩 마스크의 같은 간선이 같은 값으로 시작. Dense 계열 초기값도 바뀌었다(기록된 run 없음) |
 
 ## 열린 질문
 
@@ -67,7 +72,6 @@
 | 4 | lockbox 에 무엇을 넣나 (P7 외부 검증 설정 등) | Gate 2.5 에서 정함 | P7 | RULES 3 |
 | 5 | 사전등록 이후 `src/analysis/` 변경에 `Deviation:` 트레일러를 훅으로 강제할지 | 강제 (RULES 4 가 지금은 사람 확인뿐) | Gate 2.5 | 운영 규칙 원칙 3 |
 | 6 | 라이선스 | 미정 — 없으면 공개 저장소라도 재사용 권한이 없다 | 외부 공개 · 인용 | 기획서 §22.1-4, §27.3 (GPL RFM 코드 사용 여부와 연동) |
-| 8 | Cross-Model 첫 층의 블록 선택 규칙 | 임베딩 평균을 입력으로 받는 Router 0 추가 (교차 간선 392개 그대로) | Cross-Model 구현 (Gate 3 전) | 기획서 v0.5 §22.1-1 — 층 사이 Router 가 7개뿐 |
 
 ## 에이전트 사용
 
@@ -76,6 +80,7 @@
 
 ## 최근 변경
 
+- 2026-11-26 · Claude Code · 연결 구조 (`feat/conn-cross`): 중첩 마스크 · 교차 간선 Adapter · Router(learned · random · hash, Router 0 포함) · B-5 Parallel-Mixing · Cross-Model Top-1 · B-6, 설정 4개, 파라미터 표에 Adapter · Router 열. 열린 질문 8 해소. 초기 Router 의 argmax 가 몇 블록에 몰리는 것 확인(확률은 거의 균등)
 - 2026-11-26 · Claude Code · 문제 · 삽질 기록 체계 도입 (strata-local-llm 방식): `docs/TROUBLESHOOTING.md` T-001~008, `docs/COLLAB-LOG.md`(사람 + AI 에이전트) C-001~009 를 지금까지 일로 소급 작성, AGENTS §3 · §11 에 '생긴 날 바로 쓴다' 규칙
 - 2026-11-26 · Claude Code · Dense 계열 모델 R1 · B-1~B-4 + 파라미터 계수 · 결정적 초기화 · FP32 로짓 · 인과 마스크 테스트 (`feat/model-dense`), CI 에 CPU PyTorch 추가, 본체 CUDA bf16 테스트 통과
 - 2026-11-26 · Claude Code · **정정:** 지난 보고의 "CI 에서 분할 해시 재현"은 틀렸다. `.gitignore` 의 `data/` 가 `configs/data/` 를 숨겨 설정이 커밋되지 않았고 해시 테스트는 건너뛰어졌다. 6c71bf7 로 설정을 커밋하고 패턴을 루트 고정(`/data/` `/checkpoints/` `/runs/` `/build/`)으로 바꿨으며 회귀 테스트를 더했다

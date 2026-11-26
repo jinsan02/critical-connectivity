@@ -23,8 +23,8 @@ critical-connectivity/
 │  ├─ TROUBLESHOOTING.md · COLLAB-LOG.md   시스템 문제 T-NNN · 협업 삽질 C-NNN
 │  └─ plan/                    기준 기획서 v0.5 + 조사 문서
 ├─ env/                        conda 선언 · 설치 로그 · 하드웨어 실측
-├─ configs/                    (예정) 실험 설정 YAML
-├─ src/                        (예정) datasets · models · connectivity · training · analysis
+├─ configs/                    data · model 설정 YAML (experiments 는 예정)
+├─ src/                        datasets · models · connectivity (training · analysis 는 예정)
 ├─ scripts/                    (예정) 실행 진입점
 ├─ experiments/                LEDGER.tsv · runs/<run_id>/
 ├─ reports/                    보고서 · 그림
