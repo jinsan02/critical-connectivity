@@ -1,8 +1,8 @@
 # ── 데이터 (생성 규칙과 해시만 커밋. 기획서 §7.1.1) ─────────────────────────
-data/
+/data/
 
 # ── 체크포인트·가중치 (기획서 §15.2: 약 370GB, git 밖) ──────────────────────
-checkpoints/
+/checkpoints/
 *.pt
 *.pth
 *.ckpt
@@ -19,7 +19,7 @@ results/graphs/
 experiments/runs/**/raw/
 experiments/runs/**/*.log
 experiments/runs/**/events.out.tfevents.*
-runs/
+/runs/
 
 # ── lockbox: 확증 단계 전용 자료 (docs/RULES.md 3번) ───────────────────────
 lockbox/
@@ -34,7 +34,7 @@ __pycache__/
 .ruff_cache/
 .ipynb_checkpoints/
 .venv/
-build/
+/build/
 *.egg-info/
 
 # ── 비밀값 ────────────────────────────────────────────────────────────────

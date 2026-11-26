@@ -1,0 +1,9 @@
+# 민감도 분석 — 교환법칙 그룹 분할. (a,b) 와 (b,a) 가 같은 분할에 들어간다 (§7.1.1)
+name: add97_comm
+p: 97
+op: add
+split:
+  method: commutative
+  seed: 0
+  fractions: {train: 0.4, val: 0.1, calib: 0.1, test: 0.4}
+sha256: d34a98e7031bdff67647aa1960be5236131f2483f4f4eb19262d51a4a12c3cb6

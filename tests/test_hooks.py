@@ -3,7 +3,7 @@
 from pathlib import Path
 
 from tools import check_commit_msg as ccm
-from tools import precheck, validate_ledger
+from tools import precheck, repo, validate_ledger
 
 ROOT = Path(__file__).resolve().parents[1]
 N = len(validate_ledger.COLUMNS)
@@ -113,3 +113,16 @@ def test_ps1_have_utf8_bom():
 def test_check_commit_by_sha_reads_from_git():
     # verify.ps1 이 쓰는 경로. HEAD 는 훅을 통과해 들어온 커밋이다.
     assert ccm.main(["--commit", "HEAD"]) == 0
+
+
+def test_gitignore_hides_only_root_artifact_dirs():
+    # data/ 같은 비고정 패턴이 configs/data/ 까지 숨겨 설정이 커밋되지 않은 일이 있었다
+    # (2026-11-26). 커밋해야 하는 경로가 무시되지 않는지 본다.
+    must_track = [
+        "configs/data/add97.yaml",
+        "configs/model/dense_8m.yaml",
+        "experiments/runs/p0_r1_i1/summary.json",
+        "src/build/x.py",
+    ]
+    hidden = repo.git("check-ignore", *must_track, root=ROOT).split()
+    assert hidden == [], f".gitignore 가 커밋 대상을 숨긴다: {hidden}"
