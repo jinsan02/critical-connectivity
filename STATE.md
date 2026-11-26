@@ -5,7 +5,7 @@
 ## 지금
 
 - 마지막 갱신: 2026-11-26
-- 단계: **Gate 1 진행 중** — 기획서 v0.5 로 구현 명세 확정, 데이터 생성 · 분할부터
+- 단계: **Gate 1 진행 중** — 데이터 · Dense 계열 모델 완료, 다음은 Cross-Model · Parallel-Mixing
 - 대상 환경: 본체 desktop-5070 (RTX 5070 Ti 16GB, `C:\critical-connectivity`, conda `critconn`) — 실측 `env/hw-20261125.md`
 - 주 실행자: 사람 + Claude Code · Codex
 
@@ -23,7 +23,8 @@
 ## 다음 할 일
 
 1. ~~`src/datasets/` 모듈러 덧셈 생성 · 분할 + Gate 1 pytest~~ → `feat/data-modular` (해시: `configs/data/*.yaml`, 숫자 빈도 최소/평균 add97 0.75 · r1 0.65, 표시 없음)
-2. 모델 구현(Dense-8M · Dense-64M · Cross-Model · Parallel-Mixing) + 파라미터 수 ±1% pytest
+2. ~~모델 Dense 계열(R1 · B-1 · B-2 · B-3 · B-4) + 파라미터 수 ±1% pytest~~ → `feat/model-dense` (표: `scripts/count_params.py`)
+2b. Cross-Model · Parallel-Mixing · Router · Adapter · 마스크 (`feat/conn-cross`) — 열린 질문 8 이 필요
 3. R1 앵커 모델과 1K 스텝 처리량 · VRAM · 동시 수 벤치마크 → 기획서 §15.1 추정표를 실측치로 교체
 4. 원장 열 · run_id 규칙 확정 (열린 질문 2, 3)
 
@@ -52,6 +53,10 @@
 | 2026-11-26 | 블록 세부 구조: R1 은 [8] 그대로(LayerNorm 없음 · ReLU), 8M · 64M 계열은 pre-LN · GELU · 학습 위치 임베딩 · 입출력 분리 · bias · dropout 0 | 사람 결정 (권장안), 기획서 v0.5 §5.8 |
 | 2026-11-26 | 파라미터 계수 설계값은 블록 파라미터 $12d^2L$, ±1%. 임베딩 · 출력층 · Adapter · Router 는 따로 기록 | 사람 결정 (권장안), 기획서 v0.5 §5.8 · §12B-7 |
 | 2026-11-26 | 실행 OS 는 Windows 11 네이티브 (WSL2 안 씀) | 사람 결정 (권장안), 기획서 v0.5 §14 |
+| 2026-11-26 | 분할 seed `split_seed` = 0 | 에이전트 임의 결정 — 기획서 §12A-5 는 "하나를 고정"만 정함 |
+| 2026-11-26 | B-3 Dense-64M-8L 은 12헤드 (헤드 차원 68) | 에이전트 결정 — 기획서에 헤드 수 없음. 다른 모델의 헤드 차원 72 에 가장 가까운 약수. 파라미터 수와 무관 |
+| 2026-11-26 | 초기화: Linear · Embedding N(0, 0.02²), bias 0, LayerNorm (1, 0). CPU 에서 `init_seed` 로 만들고 옮긴다 | 에이전트 결정 (GPT 형 기본값, 파일럿에서 바꿀 수 있음) — 기획서 §15.2 "init_seed 로 재생성", §9 가중치 노름 기록 |
+| 2026-11-26 | 작업 방식: 본체에서 커밋 · push, PR CI 가 통과하면 merge commit 으로 머지까지 | 사람 지시 |
 
 ## 열린 질문
 
@@ -71,6 +76,8 @@
 
 ## 최근 변경
 
+- 2026-11-26 · Claude Code · Dense 계열 모델 R1 · B-1~B-4 + 파라미터 계수 · 결정적 초기화 · FP32 로짓 · 인과 마스크 테스트 (`feat/model-dense`), CI 에 CPU PyTorch 추가, 본체 CUDA bf16 테스트 통과
+- 2026-11-26 · Claude Code · **정정:** 지난 보고의 "CI 에서 분할 해시 재현"은 틀렸다. `.gitignore` 의 `data/` 가 `configs/data/` 를 숨겨 설정이 커밋되지 않았고 해시 테스트는 건너뛰어졌다. 6c71bf7 로 설정을 커밋하고 패턴을 루트 고정(`/data/` `/checkpoints/` `/runs/` `/build/`)으로 바꿨으며 회귀 테스트를 더했다
 - 2026-11-26 · Claude Code · 데이터 생성 · 분할 · 해시 · 숫자 빈도 (`feat/data-modular`), verify 커밋 검사 수정 · 노트북 verify 통과(테스트 32)
 - 2026-11-26 · Claude Code · 기획서 v0.5 (블록 구조 · 파라미터 계수 기준 · OS · 원본 위치 확정), STATE 반영
 - 2026-11-25 · Claude Code · 측정 전 종료 목록 4개를 채움 (`-Apply` 는 아직 실행하지 않음)
