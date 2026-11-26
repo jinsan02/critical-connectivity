@@ -1,4 +1,4 @@
-"""모델 (기획서 v0.5 §5). Router · Adapter · 마스크는 src/connectivity."""
+"""모델 (기획서 v0.6 §5). Router · Adapter · 마스크는 src/connectivity."""
 
 from src.models.build import (
     build_model,

@@ -1,6 +1,6 @@
 # src/connectivity/
 
-연결 구조 (기획서 v0.5 §5.4~§5.7, §6). 커밋 scope `conn`. 이 모듈을 쓰는 모델은 `src/models/parallel_mixing.py` · `cross_model.py`.
+연결 구조 (기획서 v0.6 §5.4~§5.7, §6). 커밋 scope `conn`. 이 모듈을 쓰는 모델은 `src/models/parallel_mixing.py` · `cross_model.py`.
 
 | 파일 | 내용 |
 | --- | --- |

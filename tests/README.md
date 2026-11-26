@@ -4,6 +4,9 @@ pytest. GPU·네트워크 없이 도는 것만 CI 에서 돈다.
 
 | 파일 | 대상 |
 | --- | --- |
-| `test_hooks.py` | 훅 본체 (커밋 메시지 · pre-commit · 원장) |
+| `test_hooks.py` | 훅 본체 (커밋 메시지 · pre-commit · 원장), `.gitignore` 가 커밋 대상을 숨기지 않는지 |
+| `test_datasets.py` | Gate 1 데이터: 분할 무결성 · 비율 · 해시 재현 · 숫자 빈도 (§7.1.1, §12B-7) |
+| `test_models.py` | Gate 1 모델: 파라미터 수 ±1% · FP32 로짓 · 결정적 초기화 · 인과 마스크, CUDA bf16 순전파 · 역전파 (CUDA 있을 때만) |
+| `test_connectivity.py` | 중첩 마스크 · Adapter(후보 392개 사전 할당) · Router · Parallel-Mixing · Cross-Model (§5.4~§5.7, §6.2) |
 
-Gate 1 테스트(파라미터 수 ±1%, 분할 무결성, 초기화 재생성 일치)는 `src/` 를 만들 때 여기에 더한다.
+통과 보고에는 skip 수를 같이 적는다 (COLLAB-LOG C-007). 빈 입력으로 조용히 넘어가는 테스트는 실패하게 만든다.

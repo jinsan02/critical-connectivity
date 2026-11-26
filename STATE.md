@@ -84,6 +84,7 @@
 
 ## 최근 변경
 
+- 2026-11-26 · Claude Code · 정돈: 문서의 기획서 참조를 v0.6 으로, README · AGENTS 현재 단계 · tests · configs · scripts README 갱신, TROUBLESHOOTING T-009(Cross-Model 스텝 시간) 추가, 본체 임시 파일 · 머지된 브랜치 정리
 - 2026-11-26 · Claude Code · 교차 간선 Adapter 를 후보 392개 전부 사전 할당 (§27.2, 열린 질문 9 해소). 막힌 간선은 출력 · 기울기에 영향 없음을 테스트, 파라미터 표에 'Adapter (활성)' 열
 - 2026-11-26 · Claude Code · 기획서 v0.6: 보조 실험 EXP-11 학습 나이테 (§28 — 파라미터 · 기능 · 행동 나이테, head 개입과 무작위 대조, 메시지 대 차단 비교, Pythia-160M MVP, 그림 R1 · R2, 지지 · 반박 표), 문헌 [62] · [63] 원문 확인 후 추가. 기획서 §27.2 와 Adapter 할당 구현의 차이를 열린 질문 9 로 올림
 - 2026-11-26 · Claude Code · 연결 구조 (`feat/conn-cross`): 중첩 마스크 · 교차 간선 Adapter · Router(learned · random · hash, Router 0 포함) · B-5 Parallel-Mixing · Cross-Model Top-1 · B-6, 설정 4개, 파라미터 표에 Adapter · Router 열. 열린 질문 8 해소. 초기 Router 의 argmax 가 몇 블록에 몰리는 것 확인(확률은 거의 균등)
