@@ -1,0 +1,13 @@
+# B-3 Dense-64M-8L — 깊이를 Cross-Model(8층)에 맞춘 64M (§12A-2)
+# 헤드 수는 기획서에 없다. 다른 모델의 헤드 차원 72 에 가장 가까운 68 (12헤드)로 정했다 (STATE 2026-11-26).
+name: dense_64m_8l
+id: B-3
+kind: dense
+d_model: 816
+n_layers: 8
+n_heads: 12
+d_ff: 3264
+norm: pre_ln
+act: gelu
+init_std: 0.02
+design_params: 63922176 # 12·d²·L
