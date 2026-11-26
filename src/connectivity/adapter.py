@@ -7,7 +7,8 @@
 **후보 392 간선의 Adapter 를 밀도와 관계없이 모두 할당한다** (§27.2). 마스크가 허용한
 간선만 순전파에 쓰고, 나머지는 기울기를 받지 않아 초기값 그대로 남는다. AdamW 는 기울기가
 ``None`` 인 파라미터를 weight decay 까지 건너뛰므로, 학습 루프는 ``zero_grad(set_to_none=True)``
-(PyTorch 기본값)를 써야 한다. 0 텐서로 지우면 막힌 Adapter 에도 weight decay 가 걸린다. 그래서 저장 파라미터 수는 밀도와 무관하게 같고, 연결을
+(PyTorch 기본값)를 써야 한다. 0 텐서로 지우면 막힌 Adapter 에도 weight decay 가 걸린다.
+그래서 저장 파라미터 수는 밀도와 무관하게 같고, 연결을
 막은 조건(ρ=0)도 메시지 조건과 같은 저장 파라미터를 가진다. 활성 파라미터 수는
 ``EdgeAdapters.n_active_params`` 로 따로 기록한다.
 
