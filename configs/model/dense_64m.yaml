@@ -1,0 +1,12 @@
+# B-2 Dense-64M (§5.2, §12A-2)
+name: dense_64m
+id: B-2
+kind: dense
+d_model: 576
+n_layers: 16
+n_heads: 8
+d_ff: 2304
+norm: pre_ln
+act: gelu
+init_std: 0.02
+design_params: 63700992 # 12·d²·L

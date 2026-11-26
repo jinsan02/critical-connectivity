@@ -1,0 +1,10 @@
+# Core 주 데이터 D01 — 기획서 v0.5 §7.1, §7.1.1 (무작위 순서쌍 분할, 기본)
+# split.seed 는 전체 실험에서 고정하는 split_seed 다 (§12A-5). 값 0 자체에 뜻은 없다.
+name: add97
+p: 97
+op: add
+split:
+  method: pair
+  seed: 0
+  fractions: {train: 0.4, val: 0.1, calib: 0.1, test: 0.4}
+sha256: e077edbb64d324294ccabc942529dd91feca3ba6cc48bf1f72076994dca7b736

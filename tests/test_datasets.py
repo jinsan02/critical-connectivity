@@ -76,6 +76,11 @@ def test_bad_fractions_rejected():
         make_split(generate(7), "pair", 0, {"train": 0.5, "test": 0.4})
 
 
+def test_data_configs_present():
+    # 비어 있으면 아래 해시 테스트가 조용히 건너뛰어진다 (2026-11-26 CI 에서 실제로 일어남).
+    assert len(CONFIGS) >= 3, CONFIGS
+
+
 @pytest.mark.parametrize("path", CONFIGS, ids=lambda p: p.stem)
 def test_config_hash_reproduces(path):
     """설정에 적힌 해시가 다시 만든 분할과 같다 — 다른 PC · CI 에서도 (§7.1.1)."""

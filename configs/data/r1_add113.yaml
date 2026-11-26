@@ -1,0 +1,9 @@
+# R1 재현 앵커 — Nanda et al. [8] 설정: p=113, Train 30%, 무작위 순서쌍 분할 (§12A-1)
+name: r1_add113
+p: 113
+op: add
+split:
+  method: pair
+  seed: 0
+  fractions: {train: 0.3, test: 0.7}
+sha256: 4b9e2ef7bbf90d7ae371510e30216aae8956c252ce32ed37c224477fd9479dcf

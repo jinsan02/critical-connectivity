@@ -1,0 +1,13 @@
+# B-4 Ensemble 8×8M — 연결 없는 8M 블록 체인 8개, 임베딩 · 출력층 공유 (§5.7 ρ=0, §12A-2)
+name: ensemble_8x8m
+id: B-4
+kind: ensemble
+d_model: 288
+n_layers: 8
+n_chains: 8
+n_heads: 4
+d_ff: 1152
+norm: pre_ln
+act: gelu
+init_std: 0.02
+design_params: 63700992 # 12·d²·L·n_chains
