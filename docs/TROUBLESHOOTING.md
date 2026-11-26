@@ -18,7 +18,7 @@
 
 | # | 날짜 | 제목 | 영역 | 상태 |
 | --- | --- | --- | --- | --- |
-| T-009 | 11-26 | Cross-Model 학습 스텝이 Dense-64M 보다 약 8배 느림 (간이 측정) | conn · model | 조치 중 |
+| T-009 | 11-26 | Cross-Model 학습 스텝이 Dense-64M 보다 약 8배 느림 (간이 측정) | conn · model | 해결 (묶음 계산 · CUDA Graph, 6.9×) |
 | T-008 | 11-26 | `.gitignore` 의 `data/` 가 `configs/data/` 까지 숨겨 분할 설정이 커밋되지 않음, CI 해시 테스트는 건너뜀 | data · infra | 해결 (6c71bf7, PR #2) |
 | T-007 | 11-26 | verify 가 멀쩡한 커밋 메시지를 거부 (PowerShell 파이프가 한국어를 깨뜨림) | infra | 해결 (ca35298) |
 | T-006 | 11-25 | 노트북 PowerShell 5.1 이 BOM 없는 `.ps1` 을 CP949 로 읽어 구문 오류 | env · infra | 해결 (a9a6fdf, 테스트) |
@@ -49,7 +49,7 @@
 
 ## T-009 Cross-Model 학습 스텝이 Dense-64M 보다 약 8배 느림 (간이 측정)
 - 날짜 · 단계 · 영역: 11-26 · G1 · conn · model
-- 상태: 조치 중 — Gate 1 벤치마크(STATE 다음 할 일 3)에서 공식 측정 후 줄인다
+- 상태: 해결 — `upgrade/fast-step` (블록 풀 묶음 계산 · 직접 어텐션 · fused AdamW · CUDA Graph). 측정은 `docs/throughput-20261126.md`
 ### 발생 로그
 PR #4 검증 중 본체(RTX 5070 Ti)에서 잰 간이 측정. B=512, bf16 autocast, AdamW, 워밍업 5 스텝 뒤 20 스텝 평균, 측정 준비(`prep-measure`) 없음:
 `dense_64m 33.5 · ensemble_8x8m 65.4 · parallel_mixing 140.2 · cross_model 257.2 ms/step`
@@ -61,7 +61,14 @@ PR #4 검증 중 본체(RTX 5070 Ti)에서 잰 간이 측정. B=512, bf16 autoca
 - 기획서 §15.1 의 Cross-Model 실행 시간 추정이 낙관적일 수 있다. Core 503회 일정과 동시 실행 수가 바뀔 수 있다.
 - 정확도 · 결과에는 영향이 없다 (테스트 95개 통과).
 ### 개선 · 조치
-아직 정하지 않았다. 방향은 사람과 토의해서 정한다.
+사람이 "병렬로 줄일 방법, 쾌적한 실험환경 먼저" 로 방향을 정했다 (11-26).
+- 프로파일링: Cross-Model 은 GPU 71 ms 대 CPU 345 ms (스텝당 행렬곱 약 2,200 번, 커널 실행 병목). Dense 계열은 3 토큰 flash attention 역전파가 GPU 시간의 약 44%.
+- 블록 풀 묶음 계산(`src/models/pool.py`): 같은 층 블록 8개의 가중치를 매 순전파 쌓아 `baddbmm` 한 번으로 계산. Cross-Model 은 블록 8개를 모든 표본에 계산한 뒤 고른 출력만 쓰고(연산 8배, 커널 수 · 동기화는 거의 없음), Adapter 는 표본별로 골라 묶음 행렬곱. Parallel-Mixing 은 층별 허용 간선을 쌓아 묶음 행렬곱.
+- 어텐션 직접 계산(`causal_attention`), Router 의 `one_hot`(동기화) 제거 → 스텝 전체를 CUDA Graph 로 캡처.
+- 결과 (배치 512): Cross-Model 237.7 → 34.4 ms (6.9×), Parallel-Mixing 194.9 → 45.3 ms (4.3×), Dense-64M 33.5 → 17.9 ms.
+- 기준 구현(`impl: loop`)을 남기고 출력 · 경로 · 기울기 동치를 테스트(`tests/test_fast_paths.py`).
+- 확인한 한계: Windows 에서 프로세스 동시 실행은 합이 늘지 않는다(약 0.92×). Seed 묶음은 작은 모델만 이득.
+- 바뀐 점: 묶음 계산에서는 배치에 안 쓰인 블록의 기울기가 None 이 아니라 0 이다 → AdamW 가 weight decay · 모멘트 감쇠를 적용한다 (STATE 결정 기록).
 - Gate 1 벤치마크에서 `torch.profiler` 로 원인을 나눈다.
 - 후보: 블록 풀 가중치를 쌓아 묶음 행렬곱(`bmm`) · 정렬 후 분배로 동기화 줄이기, Adapter 를 층별로 쌓아 한 번에 계산, `torch.compile`.
 - 바꾼 뒤에는 현재 구현과 출력이 같은지 테스트로 묶는다 (`upgrade` 커밋).
