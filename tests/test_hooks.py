@@ -108,3 +108,8 @@ def test_ps1_have_utf8_bom():
         if ".venv" not in p.parts and not p.read_bytes().startswith(b"\xef\xbb\xbf")
     ]
     assert no_bom == [], f"UTF-8 BOM 으로 저장하라: {no_bom}"
+
+
+def test_check_commit_by_sha_reads_from_git():
+    # verify.ps1 이 쓰는 경로. HEAD 는 훅을 통과해 들어온 커밋이다.
+    assert ccm.main(["--commit", "HEAD"]) == 0
