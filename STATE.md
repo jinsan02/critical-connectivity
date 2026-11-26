@@ -22,7 +22,7 @@
 
 ## 다음 할 일
 
-1. `src/datasets/` 모듈러 덧셈 생성 · 분할 + Gate 1 pytest (분할 무결성 · 숫자 빈도)
+1. ~~`src/datasets/` 모듈러 덧셈 생성 · 분할 + Gate 1 pytest~~ → `feat/data-modular` (해시: `configs/data/*.yaml`, 숫자 빈도 최소/평균 add97 0.75 · r1 0.65, 표시 없음)
 2. 모델 구현(Dense-8M · Dense-64M · Cross-Model · Parallel-Mixing) + 파라미터 수 ±1% pytest
 3. R1 앵커 모델과 1K 스텝 처리량 · VRAM · 동시 수 벤치마크 → 기획서 §15.1 추정표를 실측치로 교체
 4. 원장 열 · run_id 규칙 확정 (열린 질문 2, 3)
@@ -71,6 +71,7 @@
 
 ## 최근 변경
 
+- 2026-11-26 · Claude Code · 데이터 생성 · 분할 · 해시 · 숫자 빈도 (`feat/data-modular`), verify 커밋 검사 수정 · 노트북 verify 통과(테스트 32)
 - 2026-11-26 · Claude Code · 기획서 v0.5 (블록 구조 · 파라미터 계수 기준 · OS · 원본 위치 확정), STATE 반영
 - 2026-11-25 · Claude Code · 측정 전 종료 목록 4개를 채움 (`-Apply` 는 아직 실행하지 않음)
 - 2026-11-25 · Claude Code · 노트북 `critconn` 설치(.ps1 BOM 문제 수정) · `main` ruleset 2개 · `env/prep-measure.ps1` 과 본체 기록(기록만, `-Apply` 안 함) · 원격 실행 문서화 · 노트북 · 본체 `verify.ps1` 통과(테스트 16)
