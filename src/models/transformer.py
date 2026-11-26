@@ -7,6 +7,9 @@
 - 공통: 학습 위치 임베딩, 입력 임베딩과 출력층 분리, bias 있음, dropout 없음
 
 로짓은 FP32 로 계산한다. BF16 Softmax 오차가 Grokking 을 막을 수 있다 (§14 정밀도 주의, [25]).
+
+어텐션은 직접 계산한다(``causal_attention``). 시퀀스가 3 토큰이라 flash attention 의 역전파가
+오히려 스텝 시간의 절반 가까이를 썼다 (T-009). 어텐션 확률 softmax 는 FP32 다.
 """
 
 from __future__ import annotations
@@ -14,7 +17,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 import torch
-import torch.nn.functional as F
 from torch import nn
 
 N_CTX = 3  # "a b ="
@@ -43,6 +45,15 @@ def _norm(cfg: BlockConfig) -> nn.Module:
     return nn.LayerNorm(cfg.d_model) if cfg.norm == "pre_ln" else nn.Identity()
 
 
+def causal_attention(q: torch.Tensor, k: torch.Tensor, v: torch.Tensor) -> torch.Tensor:
+    """(…, T, hd) 인과 마스크 어텐션. 짧은 시퀀스용 직접 계산, softmax 는 FP32."""
+    t = q.shape[-2]
+    att = torch.matmul(q, k.transpose(-2, -1)) * (q.shape[-1] ** -0.5)
+    keep = torch.ones(t, t, dtype=torch.bool, device=q.device).tril()
+    att = att.float().masked_fill(~keep, float("-inf")).softmax(dim=-1)
+    return torch.matmul(att.to(v.dtype), v)
+
+
 class Attention(nn.Module):
     """인과 마스크 다중 헤드 셀프 어텐션. Q·K·V 는 한 Linear 로 묶는다 (파라미터 수는 같다)."""
 
@@ -56,7 +67,7 @@ class Attention(nn.Module):
         b, t, d = x.shape
         qkv = self.qkv(x).view(b, t, 3, self.n_heads, d // self.n_heads)
         q, k, v = qkv.permute(2, 0, 3, 1, 4)
-        y = F.scaled_dot_product_attention(q, k, v, is_causal=True)
+        y = causal_attention(q, k, v)
         return self.out(y.transpose(1, 2).reshape(b, t, d))
 
 

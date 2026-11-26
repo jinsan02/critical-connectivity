@@ -54,10 +54,18 @@ def _construct(cfg: dict, p: int) -> nn.Module:
     if kind == "dense":
         return DenseTransformer(blk, cfg["n_layers"], p)
     if kind == "ensemble":
-        return Ensemble(blk, cfg["n_layers"], cfg["n_chains"], p)
+        return Ensemble(blk, cfg["n_layers"], cfg["n_chains"], p, cfg.get("impl", "batched"))
     if kind == "parallel_mixing":
         rank = cfg.get("adapter_rank", DEFAULT_ADAPTER_RANK)
-        return ParallelMixing(blk, cfg["n_layers"], cfg["n_chains"], p, mask_from_config(cfg), rank)
+        return ParallelMixing(
+            blk,
+            cfg["n_layers"],
+            cfg["n_chains"],
+            p,
+            mask_from_config(cfg),
+            rank,
+            cfg.get("impl", "batched"),
+        )
     if kind == "cross_model":
         return CrossModel(
             blk,
@@ -70,6 +78,7 @@ def _construct(cfg: dict, p: int) -> nn.Module:
             top_k=cfg.get("top_k", 1),
             lb_coef=cfg.get("lb_coef", 0.01),
             z_coef=cfg.get("z_coef", 1e-3),
+            impl=cfg.get("impl", "batched"),
         )
     raise ValueError(f"kind 는 {KINDS} 중 하나: {kind!r}")
 

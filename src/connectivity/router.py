@@ -16,7 +16,6 @@ Router 하나가 한 층에서 쓸 블록을 고른다. 입력은 직전 잔차 
 from __future__ import annotations
 
 import torch
-import torch.nn.functional as F
 from torch import nn
 
 ROUTER_KINDS = ("learned", "random", "hash")
@@ -65,7 +64,8 @@ def load_balance_loss(logits: torch.Tensor, choice: torch.Tensor) -> torch.Tenso
     """Switch 보조 손실 N · Σ_j f_j · P_j (f: 배정 비율, P: 평균 확률). 균등하면 1."""
     n = logits.shape[1]
     probs = logits.softmax(dim=-1)
-    frac = F.one_hot(choice, n).float().mean(dim=0)
+    # F.one_hot 은 값 범위 검사로 GPU 동기화를 부른다 (CUDA Graph 불가). 비교로 만든다
+    frac = (choice[:, None] == torch.arange(n, device=choice.device)).float().mean(dim=0)
     return n * (frac * probs.mean(dim=0)).sum()
 
 

@@ -15,6 +15,7 @@ from torch import nn
 
 from src.connectivity.adapter import EdgeAdapters
 from src.connectivity.masks import ConnectionMask
+from src.models.pool import check_impl, layer_blocks, pool_forward
 from src.models.transformer import Block, BlockConfig, Embedding, Head
 
 
@@ -27,8 +28,10 @@ class ParallelMixing(nn.Module):
         p: int,
         mask: ConnectionMask,
         rank: int,
+        impl: str = "batched",
     ):
         super().__init__()
+        self.impl = check_impl(impl)
         if (mask.n_models, mask.n_layers) != (n_chains, n_layers):
             raise ValueError(
                 f"마스크 크기 {mask.n_models}×{mask.n_layers} ≠ 모델 {n_chains}×{n_layers}"
@@ -42,9 +45,41 @@ class ParallelMixing(nn.Module):
         self.head = Head(block.d_model, p, final_norm=block.norm == "pre_ln")
         self.adapters = EdgeAdapters(mask, block.d_model, rank)
         self._edges_at = [mask.edges_at(k) for k in range(n_layers - 1)]
+        for k, edges in enumerate(self._edges_at):  # 묶음 계산용 출발 · 도착 체인 번호
+            src = torch.tensor([e[1] for e in edges], dtype=torch.long)
+            dst = torch.tensor([e[2] for e in edges], dtype=torch.long)
+            self.register_buffer(f"_src{k}", src, persistent=False)
+            self.register_buffer(f"_dst{k}", dst, persistent=False)
+
+    def stacked_hidden(self, tokens: torch.Tensor) -> torch.Tensor:
+        """체인별 마지막 잔차 스트림 (N, B, T, d). 블록과 허용 간선 Adapter 를 묶어 계산."""
+        x0 = self.embed(tokens)
+        x = x0.expand(len(self.chains), *x0.shape)
+        n_layers = len(self.chains[0])
+        for k in range(n_layers):
+            x = pool_forward(layer_blocks(self.chains, k), x)
+            if k < n_layers - 1 and self._edges_at[k]:
+                x = x + self._mix(k, x)
+        return x
+
+    def _mix(self, k: int, x: torch.Tensor) -> torch.Tensor:
+        """층 k 허용 간선의 메시지를 도착 체인별로 더한 값 (N, B, T, d).
+
+        막힌 간선은 쌓지 않으므로 기울기도 받지 않는다.
+        """
+        edges = self._edges_at[k]
+        src, dst = getattr(self, f"_src{k}"), getattr(self, f"_dst{k}")
+        down = torch.stack([self.adapters[e].down.weight for e in edges])  # (E, r, d)
+        up = torch.stack([self.adapters[e].up.weight for e in edges])  # (E, d, r)
+        e, (_, b, t, d) = len(edges), x.shape
+        z = torch.bmm(x[src].reshape(e, b * t, d), down.transpose(1, 2))
+        msg = torch.bmm(z, up.transpose(1, 2)).view(e, b, t, d)
+        return torch.zeros_like(x).index_add(0, dst, msg.to(x.dtype))
 
     def chain_hidden(self, tokens: torch.Tensor) -> list:
         """체인별 마지막 잔차 스트림 목록, 각 (B, T, d)."""
+        if self.impl == "batched":
+            return list(self.stacked_hidden(tokens).unbind(0))
         x0 = self.embed(tokens)
         xs = [x0] * len(self.chains)
         n_layers = len(self.chains[0])
@@ -59,6 +94,8 @@ class ParallelMixing(nn.Module):
         return xs
 
     def hidden(self, tokens: torch.Tensor) -> torch.Tensor:
+        if self.impl == "batched":
+            return self.stacked_hidden(tokens).mean(dim=0)
         return torch.stack(self.chain_hidden(tokens)).mean(dim=0)
 
     def forward(self, tokens: torch.Tensor) -> torch.Tensor:

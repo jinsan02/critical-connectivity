@@ -24,6 +24,7 @@ from torch import nn
 from src.connectivity.adapter import EdgeAdapters
 from src.connectivity.masks import ConnectionMask
 from src.connectivity.router import Router, entropy, load_balance_loss, z_loss
+from src.models.pool import check_impl, layer_blocks, pool_forward
 from src.models.transformer import Block, BlockConfig, Embedding, Head
 
 
@@ -52,8 +53,10 @@ class CrossModel(nn.Module):
         top_k: int = 1,
         lb_coef: float = 0.01,
         z_coef: float = 1e-3,
+        impl: str = "batched",
     ):
         super().__init__()
+        self.impl = check_impl(impl)
         if top_k != 1:
             raise NotImplementedError("Top-2 · Top-4 (EXP-04) 는 아직 구현하지 않았다")
         if (mask.n_models, mask.n_layers) != (n_chains, n_layers):
@@ -74,6 +77,13 @@ class CrossModel(nn.Module):
         )
         self.adapters = EdgeAdapters(mask, block.d_model, rank)
         self.register_buffer("allowed", mask.allowed(), persistent=False)
+        # 묶음 계산용: 층 k 에서 (i, j) 이동이 쓰는 허용 간선 번호 (같은 체인이면 -1)
+        self._edges_at = [mask.edges_at(k) for k in range(n_layers - 1)]
+        eid = torch.full((max(n_layers - 1, 1), n_chains, n_chains), -1, dtype=torch.long)
+        for k, edges in enumerate(self._edges_at):
+            for idx, (_, i, j) in enumerate(edges):
+                eid[k, i, j] = idx
+        self.register_buffer("_eid", eid, persistent=False)
 
     def route(self, tokens: torch.Tensor) -> tuple[torch.Tensor, RouteInfo]:
         """마지막 잔차 스트림 (B, T, d) 와 경로 정보."""
@@ -88,9 +98,14 @@ class CrossModel(nn.Module):
             else:
                 allowed = self.allowed[k - 1][prev]
             choice, gate, logits = router(x, allowed, tokens)
-            if prev is not None:
-                x = x + self._adapt(k - 1, prev, choice, x)
-            x = self._blocks(k, choice, gate, x)
+            if self.impl == "batched":
+                if prev is not None and self._edges_at[k - 1]:
+                    x = x + self._adapt_batched(k - 1, prev, choice, x)
+                x = self._blocks_batched(k, choice, gate, x)
+            else:
+                if prev is not None:
+                    x = x + self._adapt(k - 1, prev, choice, x)
+                x = self._blocks(k, choice, gate, x)
             paths.append(choice)
             gates.append(gate)
             if logits is None:
@@ -133,6 +148,36 @@ class CrossModel(nn.Module):
             upd = xs + gate[sel, None, None].to(y.dtype) * (y - xs)
             out = out.index_put((sel,), upd.to(out.dtype))
         return out
+
+    def _adapt_batched(
+        self, layer: int, prev: torch.Tensor, choice: torch.Tensor, x: torch.Tensor
+    ) -> torch.Tensor:
+        """표본마다 (prev → choice) 간선의 Adapter 를 골라 묶어 계산한다. 같은 체인이면 0.
+
+        GPU 동기화가 없고 모양이 고정이라 CUDA Graph 로 캡처할 수 있다.
+        막힌 간선은 쌓지 않으므로 기울기도 받지 않는다.
+        """
+        edges = self._edges_at[layer]
+        eid = self._eid[layer][prev, choice]
+        idx = eid.clamp(min=0)
+        down = torch.stack([self.adapters[e].down.weight for e in edges])[idx]  # (B, r, d)
+        up = torch.stack([self.adapters[e].up.weight for e in edges])[idx]  # (B, d, r)
+        msg = torch.bmm(torch.bmm(x, down.transpose(1, 2)), up.transpose(1, 2))
+        return msg.to(x.dtype) * (eid >= 0).to(x.dtype)[:, None, None]
+
+    def _blocks_batched(
+        self, layer: int, choice: torch.Tensor, gate: torch.Tensor, x: torch.Tensor
+    ) -> torch.Tensor:
+        """층의 블록 8개를 모든 표본에 묶어 계산하고, 표본마다 고른 블록 출력만 쓴다.
+
+        연산량은 활성 블록의 8배(Ensemble 과 같음)지만 커널 수가 적고 동기화가 없다.
+        쓰이지 않은 블록의 기울기는 None 이 아니라 0 이다. 블록별 계산과 다른 점으로,
+        AdamW 는 0 기울기에도 weight decay · 모멘트 감쇠를 적용한다.
+        """
+        pooled = x.expand(self.n_chains, *x.shape)
+        y_all = pool_forward(layer_blocks(self.chains, layer), pooled)
+        y = y_all[choice, torch.arange(x.shape[0], device=x.device)]
+        return x + gate[:, None, None].to(y.dtype) * (y - x)
 
     def hidden(self, tokens: torch.Tensor) -> torch.Tensor:
         return self.route(tokens)[0]
