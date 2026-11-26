@@ -102,8 +102,14 @@ def test_adapter_and_router_params():
         pm["router"] == 0 and cm["router"] == 8 * ROUTER and hs["router"] == 0
     )  # Router 0 포함 8개
     assert pm["blocks"] == cm["blocks"] == 64 * (12 * D**2 + 13 * D)
-    low = param_breakdown(build_model(cfg("cross_model", density=0.05), P, device="meta"))
-    assert low["adapter"] == 20 * ADAPTER
+    # §27.2: 후보 392 간선을 밀도와 관계없이 모두 할당한다. 활성 몫만 밀도를 따른다
+    for name in ("parallel_mixing", "cross_model"):
+        low = build_model(cfg(name, density=0.05), P, device="meta")
+        assert param_breakdown(low)["adapter"] == 392 * ADAPTER
+        assert low.adapters.n_active_params == 20 * ADAPTER
+    zero = build_model(cfg("parallel_mixing", density=0.0), P, device="meta")
+    assert param_breakdown(zero)["total"] == pm["total"]  # 차단 조건도 저장 파라미터가 같다
+    assert zero.adapters.n_active_params == 0
 
 
 def test_random_router_is_frozen_and_hash_has_no_params():
@@ -149,7 +155,8 @@ def test_parallel_mixing_rho0_equals_ensemble():
         load_config(ROOT / "configs" / "model" / "ensemble_8x8m.yaml"), P, seed=1
     ).eval()
     pm = build_model(cfg("parallel_mixing", density=0.0), P, seed=9).eval()
-    pm.load_state_dict(en.state_dict())  # 간선 0 개면 파라미터 이름이 같다
+    missing, unexpected = pm.load_state_dict(en.state_dict(), strict=False)
+    assert unexpected == [] and missing and all(k.startswith("adapters.") for k in missing)
     x = tokens(8)
     with torch.no_grad():
         assert torch.allclose(pm(x), en(x))
@@ -241,3 +248,21 @@ def test_cross_model_bf16_logits_stay_fp32():
 def test_top_k_other_than_one_not_implemented():
     with pytest.raises(NotImplementedError):
         build_model(cfg("cross_model", top_k=2), P, device="meta")
+
+
+def test_inactive_adapters_do_not_affect_output_or_get_gradient():
+    """막힌 간선의 Adapter 는 할당만 되어 있고 순전파 · 기울기와 무관하다 (§27.2)."""
+    for name in ("parallel_mixing", "cross_model"):
+        m = build_model(cfg(name, density=0.1), P, seed=0)
+        active = set(m.adapters.mask.edges)
+        blocked = next(e for e in candidate_edges() if e not in active)
+        x = tokens(64)
+        m.eval()
+        with torch.no_grad():
+            before = m(x)
+            m.adapters[blocked].up.weight.add_(1.0)
+            after = m(x)
+        assert torch.equal(before, after), name
+        m.train()
+        torch.nn.functional.cross_entropy(m(x), torch.randint(0, P, (64,))).backward()
+        assert m.adapters[blocked].up.weight.grad is None, name
