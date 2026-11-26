@@ -25,7 +25,7 @@ tail -n 15 experiments/LEDGER.tsv
 
 | 무엇 | 기준 | 비고 |
 | --- | --- | --- |
-| 연구 설계 · 가설 · 실험 · Gate | `docs/plan/research_plan_v0.4.md` | 코드와 다르면 고치지 말고 차이를 알린다 |
+| 연구 설계 · 가설 · 실험 · Gate | `docs/plan/research_plan_v0.5.md` | 코드와 다르면 고치지 말고 차이를 알린다 |
 | 규칙 | `docs/RULES.md` | 훅·검사기와 다르면 코드가 맞다 |
 | 커밋 · 브랜치 · 태그 | `docs/COMMIT_CONVENTION.md` | `tools/check_commit_msg.py` 가 집행 |
 | 원장 열 | `docs/LEDGER_SCHEMA.md` | `tools/validate_ledger.py` 와 같아야 한다 |

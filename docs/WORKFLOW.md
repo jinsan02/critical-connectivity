@@ -7,7 +7,7 @@
 ## 1. 시작 전
 
 1. `gh issue view <번호>` 로 가설 · 완료 조건 · 기준 문서 절을 읽는다.
-2. 기준 문서(`docs/plan/research_plan_v0.4.md`)의 해당 절과 Gate 조건(§12B-7)을 확인한다.
+2. 기준 문서(`docs/plan/research_plan_v0.5.md`)의 해당 절과 Gate 조건(§12B-7)을 확인한다.
 3. 비교 묶음에서 바뀌는 변수가 하나인지 확인한다 (RULES 6).
 4. 실행 수 × $S_{\max}$ ÷ 실측 steps/s 로 시간과 VRAM 을 계산하고, 긴 작업이면 시작 전에 알린다.
 

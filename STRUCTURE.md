@@ -2,7 +2,7 @@
 
 ## 1. 읽는 순서
 
-- **사람:** `README.md` → `STATE.md` → `docs/plan/research_plan_v0.4.md` §1~§3 → `CONTRIBUTING.md`
+- **사람:** `README.md` → `STATE.md` → `docs/plan/research_plan_v0.5.md` §1~§3 → `CONTRIBUTING.md`
 - **AI 에이전트:** `AGENTS.md` 2절 순서 (`STATE` → `STRUCTURE` → `docs/RULES` → 폴더 `README`·`AGENTS` → 기준 문서 해당 절)
 
 ## 2. 폴더 트리
