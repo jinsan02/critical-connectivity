@@ -81,6 +81,7 @@
 | 2026-11-27 | P1 선택 규칙: Validation 으로 $T_{\mathrm{grok}} - T_{\mathrm{mem}} \ge$ 1,000 인 지연 Grokking 중 $T_{\mathrm{grok}}$ 최단. 없으면 최종 Val 최고 + '지연 Grokking 없음' 표시 | 사람 결정 (권장안) — §9 EXP-01: 전이가 없으면 임계점 비교가 어렵다 |
 | 2026-11-27 | P1 은 B-1 12회(약 1시간)를 먼저 돌려 격자에서 지연 Grokking 이 나오는지 보고 나머지 72회를 시작한다 | 사람 결정 (권장안) |
 | 2026-11-27 | P1 1단계 B-1: 지연 Grokking 후보 7/12 → 2단계 시작. 선택 h05 (init 0.02 · wd 1.0 · lr 3e-4, $T_{\mathrm{grok}}$ 1,500) | 설계 5절 확인 조건 · 3절 선택 규칙 (`docs/p1-pilot.md` 7절) |
+| 2026-11-27 | 실험 산출물은 모두 모은다: 지표 Parquet 은 run 폴더로 복사해 record 커밋에 넣고(run 하나에 수십 KB), 가중치는 본체 디스크에 두고 목록 · sha256 만 커밋, 대기열 로그도 커밋 | 사람 요청 (나중 전체 분석) — .gitignore 의 '지표 Parquet 은 git 밖' 방침을 run 폴더 사본으로 보완 |
 | 2026-11-27 | run_id = `<phase>_<exp>_<arch>_<변형>_i<init>m<mask>o<order>`, 학습 스크립트가 만든다 (arch 짧은 이름, 변형 `r<ρ>`/`base`, mask 없으면 `x`) | 사람 결정 (권장안, 열린 질문 3) — STRUCTURE 5절 |
 
 ## 열린 질문
@@ -100,6 +101,7 @@
 
 ## 최근 변경
 
+- 2026-11-27 · Claude Code · 산출물 모으기 (`feat/collect-outputs`): `scripts/collect_outputs.py` — run 마다 지표 Parquet 을 `experiments/runs/` 로 복사(커밋 · GitHub 백업), 가중치 목록 · sha256 `artifacts.json`, 전체 목록 `experiments/ARTIFACTS.tsv`. `run_queue.py` 가 화면 출력을 `experiments/logs/` 에 남기고 끝날 때 모으기를 자동 실행
 - 2026-11-27 · Claude Code · P1 1단계 B-1 12회 기록 · 그림, 선택 h05. 2단계 72회 시작
 - 2026-11-27 · Claude Code · P1 설계 (`docs/p1-pilot.md`): 격자 · 선택 규칙 · 단계 진행 결정, 대기열 `p1_b1.yaml`(12) · `p1_rest.yaml`(72), 열린 질문 12 를 P1 격자에 넣음
 - 2026-11-27 · Claude Code · T-012 해결: 본체 사용자 환경 변수 `MKL_THREADING_LAYER=SEQUENTIAL`, `verify.ps1` 에 환경 단계, ENVIRONMENT §2
