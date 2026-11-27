@@ -30,7 +30,7 @@
 3b. ~~학습 루프 + 작업 대기열 + 조기 종료~~ → `feat/train-loop` (Seed 묶음 학습은 아직 — R1 · Dense-8M 용, 필요하면 추가)
 4. ~~원장 열 · run_id 규칙 확정~~ → `feat/ledger-record` (LEDGER_SCHEMA v1, 학습 스크립트가 원장 행을 씀). ~~Gate 2 — R1 10 Seeds (P0) · R2 음성 대조~~ → `exp/p0-gate2` 통과 (R1 10/10, T-011 git_dirty 수정)
 5. (보조) EXP-11 학습 나이테 MVP — Pythia-160M 공개 체크포인트 8개 (기획서 v0.6 §28.6). 다운로드 승인 전에는 시작하지 않는다 (열린 질문 10)
-6. 파일럿 P1 — 8M · 64M 계열 $S_{\max}$ · 학습률 · 초기화 스케일(열린 질문 12) → Gate 2.5 사전등록. 묶음마다 `scripts/plot_runs.py` 로 그림을 남긴다
+6. 파일럿 P1 — 설계 `docs/p1-pilot.md` (7종 × 12회 = 84). **1단계 B-1 12회 진행** → 지연 Grokking 확인 뒤 2단계 72회(약 42시간 상한) → Gate 2.5 사전등록. 묶음마다 `scripts/plot_runs.py` 로 그림
 
 ## 사람에게 요청한 것
 
@@ -77,6 +77,9 @@
 | 2026-11-27 | Gate 2 통과: R1 10/10 Grokking ($T_{\mathrm{grok}}$ 3,300~6,900, 중앙값 5,850), R2 음성(Train 무작위 라벨) Test 0.0088~0.0093 = 우연 1/113 ≈ 0.0088 (±2%p 안, Train 은 100% 암기), R2 양성(Train 90%) $T_{\mathrm{grok}}$ 200 | 기획서 §12B-7, 원장 16 run (커밋 d6b4f19) |
 | 2026-11-27 | `git_dirty` 는 기록 출력(`experiments/LEDGER.tsv` · `experiments/runs/`)을 빼고 코드 변경만 본다 | 에이전트 결정 — T-011. Gate 2 16 run 의 `git_dirty 1` 은 원장 쓰기 때문이며 코드는 d6b4f19 그대로 |
 | 2026-11-27 | 본체 사용자 환경 변수 `MKL_THREADING_LAYER=SEQUENTIAL` 고정, `verify.ps1` 이 numpy 행렬곱을 먼저 확인 | 사람 결정 — T-012 (MKL INTEL 계층 · llvm-openmp 충돌). 패키지를 바꾸지 않아 환경 재현성 그대로 |
+| 2026-11-27 | P1 격자: 아키텍처마다 lr {1e-4, 3e-4, 1e-3} × wd {0.1, 1.0} × init {0.02, 1/√d} = 12회, Seed 1개, ρ = 1.0, D01 · 배치 256 · $S_{\max}$ 100K. 기획서 EXP-01 의 wd 0.01 과 학습 비율 조율은 뺐다 | 사람 결정 (권장안) — §12A-4 동일 탐색 예산 · 동일 분할, T-010 초기화. `docs/p1-pilot.md` |
+| 2026-11-27 | P1 선택 규칙: Validation 으로 $T_{\mathrm{grok}} - T_{\mathrm{mem}} \ge$ 1,000 인 지연 Grokking 중 $T_{\mathrm{grok}}$ 최단. 없으면 최종 Val 최고 + '지연 Grokking 없음' 표시 | 사람 결정 (권장안) — §9 EXP-01: 전이가 없으면 임계점 비교가 어렵다 |
+| 2026-11-27 | P1 은 B-1 12회(약 1시간)를 먼저 돌려 격자에서 지연 Grokking 이 나오는지 보고 나머지 72회를 시작한다 | 사람 결정 (권장안) |
 | 2026-11-27 | run_id = `<phase>_<exp>_<arch>_<변형>_i<init>m<mask>o<order>`, 학습 스크립트가 만든다 (arch 짧은 이름, 변형 `r<ρ>`/`base`, mask 없으면 `x`) | 사람 결정 (권장안, 열린 질문 3) — STRUCTURE 5절 |
 
 ## 열린 질문
@@ -87,7 +90,7 @@
 | 5 | 사전등록 이후 `src/analysis/` 변경에 `Deviation:` 트레일러를 훅으로 강제할지 | 강제 (RULES 4 가 지금은 사람 확인뿐) | Gate 2.5 | 운영 규칙 원칙 3 |
 | 6 | 라이선스 | 미정 — 없으면 공개 저장소라도 재사용 권한이 없다 | 외부 공개 · 인용 | 기획서 §22.1-4, §27.3 (GPL RFM 코드 사용 여부와 연동) |
 | 10 | EXP-11 MVP 실행 시점과 Pythia 체크포인트 다운로드(약 2.6GB) | Gate 1 벤치마크 뒤 | EXP-11 MVP | 기획서 v0.6 §22.1-9 |
-| 12 | 8M · 64M 계열 초기화 스케일 (지금 0.02) | 파일럿(P1)에서 1/√d 와 비교해 정한다 — R1 은 0.02 로 Grokking 하지 않았다(T-010) | P1 · Gate 2.5 | 기획서 §9 EXP-01 (초기화 스케일 기록), [16] |
+| 12 | 8M · 64M 계열 초기화 스케일 (지금 0.02) | P1 격자에 넣었다 (h01~h06 은 0.02, h07~h12 는 1/√d). 아키텍처별 선택 결과로 Gate 2.5 에서 정한다 | Gate 2.5 | 기획서 §9 EXP-01, [16], T-010, `docs/p1-pilot.md` |
 
 ## 에이전트 사용
 
@@ -96,6 +99,7 @@
 
 ## 최근 변경
 
+- 2026-11-27 · Claude Code · P1 설계 (`docs/p1-pilot.md`): 격자 · 선택 규칙 · 단계 진행 결정, 대기열 `p1_b1.yaml`(12) · `p1_rest.yaml`(72), 열린 질문 12 를 P1 격자에 넣음
 - 2026-11-27 · Claude Code · T-012 해결: 본체 사용자 환경 변수 `MKL_THREADING_LAYER=SEQUENTIAL`, `verify.ps1` 에 환경 단계, ENVIRONMENT §2
 - 2026-11-27 · Claude Code · 학습 곡선 그림 (`feat/viz-curves`): `src/analysis/curves.py` · `scripts/plot_runs.py`, Gate 2 그림 3장(`results/figures/gate2/`), 지표 Parquet 을 `ckpt_every` 마다 저장(진행 중 run 도 그림). 본체 numpy 행렬곱 충돌 발견 · 우회(T-012)
 - 2026-11-27 · Claude Code · **Gate 2 통과** (`exp/p0-gate2`): R1 10 Seeds 10/10 Grokking, R2 음성 우연 수준 · 양성 $T_{\mathrm{grok}}$ 200, 원장 16 run 기록. 대기열이 원장 쓰기로 `git_dirty` 를 1 로 만드는 문제 수정(T-011)
