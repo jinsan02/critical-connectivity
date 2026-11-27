@@ -1,4 +1,4 @@
-﻿# 커밋 전 전체 검증 — 린트 → 포맷 → 테스트 → 원장 → push 안 한 커밋의 메시지
+﻿# 커밋 전 전체 검증 — 환경 → 린트 → 포맷 → 테스트 → 원장 → push 안 한 커밋의 메시지
 # 사용: powershell -NoProfile -ExecutionPolicy Bypass -File verify.ps1
 $ErrorActionPreference = 'Continue'
 Set-Location $PSScriptRoot
@@ -11,6 +11,14 @@ if (Test-Path $ruff) { $ruffExe = $ruff; $ruffPre = @() } else { $ruffExe = $py;
 Write-Host "python: $py"
 Write-Host "ruff  : $ruffExe $($ruffPre -join ' ')"
 $fail = 0
+
+Write-Host '== 환경 (numpy 행렬곱)'
+# pytest 는 conftest 가 MKL 계층을 정해 이 문제를 가린다. 여기서는 사용자 환경 그대로 본다 (T-012)
+& $py -c "import numpy as np; a = np.ones((64, 64)); assert (a @ a)[0, 0] == 64"
+if ($LASTEXITCODE -ne 0) {
+  $fail = 1
+  Write-Host '   실패 — MKL_THREADING_LAYER=SEQUENTIAL 사용자 환경 변수를 확인 (TROUBLESHOOTING T-012)'
+} else { Write-Host "   통과 (MKL_THREADING_LAYER=$env:MKL_THREADING_LAYER)" }
 
 Write-Host '== 린트 (ruff check)'
 & $ruffExe @ruffPre check .
