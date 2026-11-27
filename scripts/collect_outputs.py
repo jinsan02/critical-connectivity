@@ -91,8 +91,12 @@ def collect_run(run_id: str, status: str, root: Path) -> dict:
     elif not dst.exists():
         missing.append("metrics")
 
+    snap = root / "checkpoints" / run_id / "snapshots.json"
+    if snap.exists():
+        shutil.copy2(snap, run_dir / "snapshots.json")
+
     files = []
-    for name in ("config.json", "summary.json", "metrics.parquet", "fail.json"):
+    for name in ("config.json", "summary.json", "metrics.parquet", "snapshots.json", "fail.json"):
         p = run_dir / name
         if p.exists():
             files.append(_file_entry(p, root, old))

@@ -39,6 +39,18 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 @dataclass
+class SnapshotConfig:
+    """학습 중간 가중치 — 나중 분석용 (STATE 2026-11-27). 기본은 끔.
+
+    t0 · grok · final 외에 더 남긴다. 파일은 ``snap_<스텝>.pt``, 이유는 ``snapshots.json``.
+    """
+
+    steps: tuple = ()  # 고정 스텝 (로그 간격)
+    rise_acc: float | None = None  # 평가 정확도가 처음 이 값 이상인 스텝 (Grokking 직전)
+    after_candidate: int | None = None  # Grokking 후보 + N 스텝 (§12B-3 +5K)
+
+
+@dataclass
 class TrainConfig:
     lr: float = 3e-4
     weight_decay: float = 0.1
@@ -54,14 +66,17 @@ class TrainConfig:
     cuda_graph: bool = True
     precision: str = "bf16"  # bf16 (autocast, 로짓 FP32) 또는 fp32
     early_stop: EarlyStopConfig = field(default_factory=EarlyStopConfig)
+    snapshots: SnapshotConfig = field(default_factory=SnapshotConfig)
 
     @classmethod
     def from_dict(cls, d: dict) -> TrainConfig:
         d = dict(d)
         es = EarlyStopConfig(**d.pop("early_stop", {}))
+        sn = dict(d.pop("snapshots", None) or {})
+        sn["steps"] = tuple(int(s) for s in sn.get("steps", ()))
         if "betas" in d:
             d["betas"] = tuple(d["betas"])
-        return cls(early_stop=es, **d)
+        return cls(early_stop=es, snapshots=SnapshotConfig(**sn), **d)
 
 
 @dataclass
@@ -164,6 +179,7 @@ class Trainer:
         self.step = 0
         self.rows: list[dict] = []
         self.saved_t0 = False
+        self.snapshots: list[dict] = []  # [{step, reasons, file}]
         self.wall_before = 0.0
         self._graph = None
         self._order = None
@@ -296,6 +312,27 @@ class Trainer:
         if not self.saved_t0 and (self.step >= self.tracker.t0):
             self._save_weights("t0")
             self.saved_t0 = True
+        self._maybe_snapshot()
+
+    def _maybe_snapshot(self) -> None:
+        sc = self.cfg.snapshots
+        reasons = []
+        if self.step in sc.steps:
+            reasons.append("step")
+        rose = any("rise" in s["reasons"] for s in self.snapshots)
+        if sc.rise_acc is not None and not rose and self.rows[-1]["eval_acc"] >= sc.rise_acc:
+            reasons.append("rise")
+        cand = self.tracker.candidate
+        if sc.after_candidate and cand is not None and self.step == cand + sc.after_candidate:
+            reasons.append("after_candidate")
+        if not reasons:
+            return
+        name = f"snap_{self.step:06d}"
+        self._save_weights(name)
+        self.snapshots.append({"step": self.step, "reasons": reasons, "file": f"{name}.pt"})
+        (self.paths.ckpt_dir / "snapshots.json").write_text(
+            json.dumps(self.snapshots, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
 
     def save_resume(self, wall: float) -> None:
         self.paths.ckpt_dir.mkdir(parents=True, exist_ok=True)
@@ -308,6 +345,7 @@ class Trainer:
                 "tracker": self.tracker.state(),
                 "rows": self.rows,
                 "saved_t0": self.saved_t0,
+                "snapshots": self.snapshots,
                 "wall": wall,
             },
             tmp,
@@ -323,6 +361,7 @@ class Trainer:
         self.opt.load_state_dict(st["opt"])
         self.tracker.load_state(st["tracker"])
         self.rows, self.saved_t0 = st["rows"], st["saved_t0"]
+        self.snapshots = st.get("snapshots", [])
         self.step, self.wall_before = st["step"], st["wall"]
         return True
 
