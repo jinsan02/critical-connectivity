@@ -19,3 +19,7 @@ early_stop:
   min_window: 5000
   rel_window: 0.5
   post_grok_steps: 20000
+snapshots: # 학습 중간 가중치 8개 — 나중 분석용 (STATE 2026-11-27, 사람 결정)
+  steps: [1000, 2000, 5000, 10000, 20000, 50000] # 로그 간격 6개
+  rise_acc: 0.5 # 평가 정확도가 처음 50% 를 넘는 스텝 (Grokking 직전)
+  after_candidate: 5000 # Grokking 후보 + 5K (§12B-3)

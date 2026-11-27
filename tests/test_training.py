@@ -336,3 +336,36 @@ def test_p1_queue_grid():
         key = tuple(s for s in j["sets"] if s.startswith("train."))
         lrwd.setdefault(j["model"].name, []).append(key)
     assert len({tuple(v) for v in lrwd.values()}) == 1  # 모든 아키텍처가 같은 lr × wd 순서
+
+
+def test_snapshots_saved_at_policy_steps(tmp_path):
+    """중간 가중치: 고정 스텝 · 평가 정확도 상승 · 후보 + N (STATE 2026-11-27)."""
+    paths = RunPaths.under(tmp_path, "snap")
+    cfg = tiny_train(snapshots={"steps": [40, 100], "rise_acc": 0.0, "after_candidate": 20})
+    train_run(small_dense(), TINY_DATA, cfg, paths, "snap", device="cpu")
+    meta = json.loads((paths.ckpt_dir / "snapshots.json").read_text(encoding="utf-8"))
+    by_step = {m["step"]: m["reasons"] for m in meta}
+    assert "rise" in by_step[0]  # 정확도 0 이상 → 첫 평가에서
+    assert by_step[40] == ["step"] and by_step[100] == ["step"]
+    for m in meta:
+        assert (paths.ckpt_dir / m["file"]).exists()
+        assert torch.load(paths.ckpt_dir / m["file"])["step"] == m["step"]
+
+
+def test_snapshots_off_by_default(tmp_path):
+    paths = RunPaths.under(tmp_path, "nosnap")
+    train_run(small_dense(), TINY_DATA, tiny_train(), paths, "nosnap", device="cpu")
+    assert not list(paths.ckpt_dir.glob("snap_*.pt"))
+    assert not (paths.ckpt_dir / "snapshots.json").exists()
+
+
+def test_base_config_snapshot_policy():
+    import yaml  # noqa: PLC0415
+
+    for name in ("base", "r1"):
+        d = yaml.safe_load(
+            (ROOT / "configs" / "train" / f"{name}.yaml").read_text(encoding="utf-8")
+        )
+        sc = TrainConfig.from_dict(d).snapshots
+        assert sc.steps == (1000, 2000, 5000, 10000, 20000, 50000)
+        assert sc.rise_acc == 0.5 and sc.after_candidate == 5000

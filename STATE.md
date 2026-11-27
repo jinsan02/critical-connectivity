@@ -82,6 +82,7 @@
 | 2026-11-27 | P1 은 B-1 12회(약 1시간)를 먼저 돌려 격자에서 지연 Grokking 이 나오는지 보고 나머지 72회를 시작한다 | 사람 결정 (권장안) |
 | 2026-11-27 | P1 1단계 B-1: 지연 Grokking 후보 7/12 → 2단계 시작. 선택 h05 (init 0.02 · wd 1.0 · lr 3e-4, $T_{\mathrm{grok}}$ 1,500) | 설계 5절 확인 조건 · 3절 선택 규칙 (`docs/p1-pilot.md` 7절) |
 | 2026-11-27 | 실험 산출물은 모두 모은다: 지표 Parquet 은 run 폴더로 복사해 record 커밋에 넣고(run 하나에 수십 KB), 가중치는 본체 디스크에 두고 목록 · sha256 만 커밋, 대기열 로그도 커밋 | 사람 요청 (나중 전체 분석) — .gitignore 의 '지표 Parquet 은 git 밖' 방침을 run 폴더 사본으로 보완 |
+| 2026-11-27 | 학습 중간 가중치(스냅샷) 8개를 더 남긴다: 스텝 1K · 2K · 5K · 10K · 20K · 50K, 평가 정확도가 처음 50% 를 넘는 스텝(Grokking 직전), Grokking 후보 + 5K. `configs/train/*.yaml` 의 `snapshots`. 지금 도는 P1 2단계에는 적용되지 않고 다음 대기열부터 | 사람 결정 (권장안) — 기획서 §22.1 '궤적 스냅샷 정책은 Gate 2.5 전에', EXP-11 · 층별 변화 분석용. 64M급 run 하나 약 1GB 추가, P2~P7 약 420GB (디스크 여유 1.47TB) |
 | 2026-11-27 | run_id = `<phase>_<exp>_<arch>_<변형>_i<init>m<mask>o<order>`, 학습 스크립트가 만든다 (arch 짧은 이름, 변형 `r<ρ>`/`base`, mask 없으면 `x`) | 사람 결정 (권장안, 열린 질문 3) — STRUCTURE 5절 |
 
 ## 열린 질문
@@ -101,6 +102,7 @@
 
 ## 최근 변경
 
+- 2026-11-27 · Claude Code · 학습 중간 가중치 정책 (`feat/snapshots`): `SnapshotConfig`, `snap_<스텝>.pt` + `snapshots.json`, 재개 시 이어 감, 모으기가 `snapshots.json` 을 run 폴더로 복사
 - 2026-11-27 · Claude Code · 산출물 모으기 (`feat/collect-outputs`): `scripts/collect_outputs.py` — run 마다 지표 Parquet 을 `experiments/runs/` 로 복사(커밋 · GitHub 백업), 가중치 목록 · sha256 `artifacts.json`, 전체 목록 `experiments/ARTIFACTS.tsv`. `run_queue.py` 가 화면 출력을 `experiments/logs/` 에 남기고 끝날 때 모으기를 자동 실행
 - 2026-11-27 · Claude Code · P1 1단계 B-1 12회 기록 · 그림, 선택 h05. 2단계 72회 시작
 - 2026-11-27 · Claude Code · P1 설계 (`docs/p1-pilot.md`): 격자 · 선택 규칙 · 단계 진행 결정, 대기열 `p1_b1.yaml`(12) · `p1_rest.yaml`(72), 열린 질문 12 를 P1 격자에 넣음
