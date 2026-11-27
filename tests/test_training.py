@@ -284,3 +284,32 @@ def test_gate2_queue_run_ids():
     assert len(ids) == 16 and len(set(ids)) == 16
     assert ids[0] == "p0_r1_r1_base_i0mxo0" and "p0_r2_r1_neg_i2mxo0" in ids
     assert "p0_r2_r1_pos_i0mxo0" in ids
+
+
+def test_git_dirty_ignores_record_outputs(tmp_path):
+    """대기열이 쓰는 원장 · run 요약은 git_dirty 로 치지 않고, 코드 변경은 친다 (T-011)."""
+    import subprocess
+
+    from src.training.trainer import _git
+
+    def git(*args):
+        subprocess.run(["git", *args], cwd=tmp_path, check=True, capture_output=True)
+
+    run_dir = tmp_path / "experiments" / "runs" / "r0"
+    run_dir.mkdir(parents=True)
+    ledger = tmp_path / "experiments" / "LEDGER.tsv"
+    ledger.write_text("h\n")
+    (run_dir / "summary.json").write_text("{}")
+    (tmp_path / "code.py").write_text("x = 1\n")
+    git("init", "-q")
+    git("add", ".")
+    git("-c", "user.name=t", "-c", "user.email=t@example.invalid", "commit", "-q", "-m", "init")
+    assert _git(tmp_path)[1] == 0
+
+    ledger.write_text("h\nrow\n")
+    (run_dir / "summary.json").write_text('{"a": 1}')
+    (tmp_path / "experiments" / "runs" / "r1").mkdir()
+    assert _git(tmp_path)[1] == 0
+
+    (tmp_path / "code.py").write_text("x = 2\n")
+    assert _git(tmp_path)[1] == 1
