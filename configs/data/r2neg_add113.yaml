@@ -1,0 +1,11 @@
+# R2-음성 대조 — R1 과 같은 분할(p=113, Train 30%)에서 Train 정답만 무작위로 섞는다 (§12A-1)
+# 기대: Train 은 암기, Test 는 우연 수준 1/113 ≈ 0.9% (Gate 2: ±2%p). Test 정답은 그대로다.
+name: r2neg_add113
+p: 113
+op: add
+split:
+  method: pair
+  seed: 0
+  fractions: {train: 0.3, test: 0.7}
+labels: {mode: random, seed: 0, splits: [train]}
+sha256: 4b9e2ef7bbf90d7ae371510e30216aae8956c252ce32ed37c224477fd9479dcf # r1_add113 과 같은 분할

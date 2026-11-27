@@ -1,0 +1,23 @@
+# Gate 2 (P0, 기획서 §12B-7 · §15.1): R1 10 Seeds + R2 음성 · 양성 대조 각 3 Seeds = 16회
+# 판정: R1 10개 중 8개 이상 Grokking, R2-음성 Test 정확도가 우연 수준(1/113) ±2%p
+defaults:
+  phase: p0
+  model: configs/model/r1.yaml
+  train: configs/train/r1.yaml
+jobs:
+  - {exp: r1, model: configs/model/r1.yaml, data: configs/data/r1_add113.yaml, set: {train.init_seed: 0}}
+  - {exp: r1, model: configs/model/r1.yaml, data: configs/data/r1_add113.yaml, set: {train.init_seed: 1}}
+  - {exp: r1, model: configs/model/r1.yaml, data: configs/data/r1_add113.yaml, set: {train.init_seed: 2}}
+  - {exp: r1, model: configs/model/r1.yaml, data: configs/data/r1_add113.yaml, set: {train.init_seed: 3}}
+  - {exp: r1, model: configs/model/r1.yaml, data: configs/data/r1_add113.yaml, set: {train.init_seed: 4}}
+  - {exp: r1, model: configs/model/r1.yaml, data: configs/data/r1_add113.yaml, set: {train.init_seed: 5}}
+  - {exp: r1, model: configs/model/r1.yaml, data: configs/data/r1_add113.yaml, set: {train.init_seed: 6}}
+  - {exp: r1, model: configs/model/r1.yaml, data: configs/data/r1_add113.yaml, set: {train.init_seed: 7}}
+  - {exp: r1, model: configs/model/r1.yaml, data: configs/data/r1_add113.yaml, set: {train.init_seed: 8}}
+  - {exp: r1, model: configs/model/r1.yaml, data: configs/data/r1_add113.yaml, set: {train.init_seed: 9}}
+  - {exp: r2, variant: neg, model: configs/model/r1.yaml, data: configs/data/r2neg_add113.yaml, set: {train.init_seed: 0}}
+  - {exp: r2, variant: neg, model: configs/model/r1.yaml, data: configs/data/r2neg_add113.yaml, set: {train.init_seed: 1}}
+  - {exp: r2, variant: neg, model: configs/model/r1.yaml, data: configs/data/r2neg_add113.yaml, set: {train.init_seed: 2}}
+  - {exp: r2, variant: pos, model: configs/model/r1.yaml, data: configs/data/r2pos_add113.yaml, set: {train.init_seed: 0}}
+  - {exp: r2, variant: pos, model: configs/model/r1.yaml, data: configs/data/r2pos_add113.yaml, set: {train.init_seed: 1}}
+  - {exp: r2, variant: pos, model: configs/model/r1.yaml, data: configs/data/r2pos_add113.yaml, set: {train.init_seed: 2}}

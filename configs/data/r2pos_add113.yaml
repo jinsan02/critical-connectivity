@@ -1,0 +1,9 @@
+# R2-양성 대조 — Train 90% (p=113). 기대: 지연 없이 빠르게 일반화 (§12A-1, 과제 학습 가능성 확인)
+name: r2pos_add113
+p: 113
+op: add
+split:
+  method: pair
+  seed: 0
+  fractions: {train: 0.9, test: 0.1}
+sha256: 273bb2386b0bcfc4359d24dcf6acec7b7552df293990b768a7134b18c634399f
