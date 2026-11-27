@@ -1,1 +1,1 @@
-ts_utc	run_id	phase	exp_id	status	arch	task	p	train_frac	rho	router	split_seed	init_seed	mask_seed	order_seed	s_max	steps_done	t_mem	t0	t_grok	censored	train_acc	val_acc	steps_per_s	peak_vram_mb	wall_s	concurrent	git_commit	git_dirty	config_sha256	env_sha256	note
+ts_utc	run_id	phase	exp_id	status	arch	task	p	train_frac	rho	router	split_seed	init_seed	mask_seed	order_seed	s_max	steps_done	stop_reason	t_mem	t0	t_grok	censored	anti_grok	train_acc	val_acc	steps_per_s	peak_vram_mb	wall_s	concurrent	git_commit	git_dirty	config_sha256	env_sha256	note

@@ -1,6 +1,6 @@
 # LEDGER_SCHEMA — `experiments/LEDGER.tsv` 열 정의
 
-> **상태: 초안 v0.** 첫 `record` 전(Gate 1)에 확정한다. 행이 하나도 없는 동안은 `chore(infra):` 커밋으로 자유롭게 바꿀 수 있다.
+> **상태: v1 확정 (2026-11-27, 사람 결정 — 초안 v0 + `stop_reason` · `anti_grok`).** 행이 생긴 뒤에는 열을 바꾸지 않는다. 바꿔야 하면 새 판(v2)과 이행 규칙을 정한다.
 > 바꿀 때는 이 문서와 [`tools/validate_ledger.py`](../tools/validate_ledger.py) 의 `COLUMNS` 를 같은 커밋에서 고친다.
 
 - 탭 구분, UTF-8, LF. 한 행 = run 하나의 상태 변화 하나 (`start` → `ok` 또는 `fail`)
@@ -23,9 +23,11 @@
 | `split_seed` `init_seed` `mask_seed` `order_seed` | 정수 | Seed 흐름 네 개 | §12A-5 |
 | `s_max` | 정수 | 최대 학습 스텝 | §12B-5 |
 | `steps_done` | 정수 | 실제 학습 스텝 | |
+| `stop_reason` | `s_max` · `early_stop` · `NA` | 학습을 멈춘 이유 (조기 종료, STATE 2026-11-27) | §10.2 |
 | `t_mem` `t0` `t_grok` | 정수 · `NA` | 암기 · 예측 · Grokking 시점 | §10, §12B-3 |
 | `censored` | `0` · `1` | $S_{\max}$ 안에 Grokking 하지 못함 | §12B-4 |
-| `train_acc` `val_acc` | 0~1 | 종료 시점 정확도 | §11 |
+| `anti_grok` | `0` · `1` | $T_{\mathrm{grok}}$ 뒤 관측 기간 안에 평가 정확도 < 0.5 | §10.2 |
+| `train_acc` `val_acc` | 0~1 | 종료 시점 정확도. `val_acc` 는 평가 분할(기본 val, R1 은 test) | §11 |
 | `steps_per_s` | 실수 | 실측 처리량 | §15.1 |
 | `peak_vram_mb` | 정수 | `torch.cuda.max_memory_allocated()` | §15.1 |
 | `wall_s` | 실수 | 벽시계 시간 | |
@@ -34,4 +36,4 @@
 | `config_sha256` `env_sha256` | 64 hex | 설정 · 환경 해시 | |
 | `note` | 자유 (탭 금지) | | |
 
-열린 항목: $C_{\mathrm{eff}}$·Router 엔트로피 같은 $t_0$ 지표는 run 별 Parquet(`results/metrics/`)에 두고 원장에는 넣지 않는 안을 권장한다. Gate 1 에서 정한다.
+$C_{\mathrm{eff}}$ · Router 엔트로피 같은 지표는 run 별 Parquet(`results/metrics/<run_id>.parquet`)에 두고 원장에는 넣지 않는다 (v1 결정). 원장 행은 `scripts/train.py` · `scripts/run_queue.py` 가 쓴다 (`src/training/ledger.py`): 시작에 `start`, 끝에 `ok`(`note` = 멈춘 이유) 또는 `fail`(`note` = 오류). 재개한 실행은 `start` 행의 `note` 가 `resume` 이다.
