@@ -31,7 +31,6 @@
 4. ~~원장 열 · run_id 규칙 확정~~ → `feat/ledger-record` (LEDGER_SCHEMA v1, 학습 스크립트가 원장 행을 씀). ~~Gate 2 — R1 10 Seeds (P0) · R2 음성 대조~~ → `exp/p0-gate2` 통과 (R1 10/10, T-011 git_dirty 수정)
 5. (보조) EXP-11 학습 나이테 MVP — Pythia-160M 공개 체크포인트 8개 (기획서 v0.6 §28.6). 다운로드 승인 전에는 시작하지 않는다 (열린 질문 10)
 6. 파일럿 P1 — 8M · 64M 계열 $S_{\max}$ · 학습률 · 초기화 스케일(열린 질문 12) → Gate 2.5 사전등록. 묶음마다 `scripts/plot_runs.py` 로 그림을 남긴다
-7. 본체 numpy MKL 충돌(T-012) 영구 수정 — 환경 변경이라 사람 승인 필요
 
 ## 사람에게 요청한 것
 
@@ -77,6 +76,7 @@
 | 2026-11-27 | 원장 열 v1 = 초안 v0 + `stop_reason` · `anti_grok`. Router 엔트로피 등은 Parquet 에만 | 사람 결정 (권장안, 열린 질문 2) — 두 열은 조기 종료 결정으로 생긴 정보 |
 | 2026-11-27 | Gate 2 통과: R1 10/10 Grokking ($T_{\mathrm{grok}}$ 3,300~6,900, 중앙값 5,850), R2 음성(Train 무작위 라벨) Test 0.0088~0.0093 = 우연 1/113 ≈ 0.0088 (±2%p 안, Train 은 100% 암기), R2 양성(Train 90%) $T_{\mathrm{grok}}$ 200 | 기획서 §12B-7, 원장 16 run (커밋 d6b4f19) |
 | 2026-11-27 | `git_dirty` 는 기록 출력(`experiments/LEDGER.tsv` · `experiments/runs/`)을 빼고 코드 변경만 본다 | 에이전트 결정 — T-011. Gate 2 16 run 의 `git_dirty 1` 은 원장 쓰기 때문이며 코드는 d6b4f19 그대로 |
+| 2026-11-27 | 본체 사용자 환경 변수 `MKL_THREADING_LAYER=SEQUENTIAL` 고정, `verify.ps1` 이 numpy 행렬곱을 먼저 확인 | 사람 결정 — T-012 (MKL INTEL 계층 · llvm-openmp 충돌). 패키지를 바꾸지 않아 환경 재현성 그대로 |
 | 2026-11-27 | run_id = `<phase>_<exp>_<arch>_<변형>_i<init>m<mask>o<order>`, 학습 스크립트가 만든다 (arch 짧은 이름, 변형 `r<ρ>`/`base`, mask 없으면 `x`) | 사람 결정 (권장안, 열린 질문 3) — STRUCTURE 5절 |
 
 ## 열린 질문
@@ -96,6 +96,7 @@
 
 ## 최근 변경
 
+- 2026-11-27 · Claude Code · T-012 해결: 본체 사용자 환경 변수 `MKL_THREADING_LAYER=SEQUENTIAL`, `verify.ps1` 에 환경 단계, ENVIRONMENT §2
 - 2026-11-27 · Claude Code · 학습 곡선 그림 (`feat/viz-curves`): `src/analysis/curves.py` · `scripts/plot_runs.py`, Gate 2 그림 3장(`results/figures/gate2/`), 지표 Parquet 을 `ckpt_every` 마다 저장(진행 중 run 도 그림). 본체 numpy 행렬곱 충돌 발견 · 우회(T-012)
 - 2026-11-27 · Claude Code · **Gate 2 통과** (`exp/p0-gate2`): R1 10 Seeds 10/10 Grokking, R2 음성 우연 수준 · 양성 $T_{\mathrm{grok}}$ 200, 원장 16 run 기록. 대기열이 원장 쓰기로 `git_dirty` 를 1 로 만드는 문제 수정(T-011)
 - 2026-11-27 · Claude Code · 원장 연결 (`feat/ledger-record`): LEDGER_SCHEMA v1 확정, run_id 자동 생성, `train.py` · `run_queue.py` 가 원장에 start · ok/fail 행을 씀. 열린 질문 2 · 3 해소

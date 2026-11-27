@@ -23,6 +23,12 @@ C:\ProgramData\anaconda3\envs\critconn\python.exe -c "import torch; print(torch.
 
 설치가 끝나면 실제 버전을 `env/critconn.yml` 에 고정하고 설치 로그를 `env/` 에 남긴다.
 
+**본체 사용자 환경 변수 `MKL_THREADING_LAYER=SEQUENTIAL`** (2026-11-27 설정). 없으면 `critconn` 의 numpy 행렬곱이 `0xC06D007F` 로 죽는다 (MKL INTEL 스레딩 · `llvm-openmp`, TROUBLESHOOTING T-012). `verify.ps1` 첫 단계가 확인한다. 환경을 새로 만들거나 다른 PC 에 설치할 때도 같은 값을 둔다:
+
+```powershell
+[Environment]::SetEnvironmentVariable('MKL_THREADING_LAYER', 'SEQUENTIAL', 'User')
+```
+
 ## 3. 저장소 연결
 
 ```powershell
