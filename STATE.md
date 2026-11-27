@@ -5,7 +5,7 @@
 ## 지금
 
 - 마지막 갱신: 2026-11-26
-- 단계: **Gate 1 진행 중** — 데이터 · 모델 · 연결 구조 · 학습 스텝 고속화 완료(예비 처리량 `docs/throughput-20261126.md`), 다음은 학습 루프 · 작업 대기열과 공식 벤치마크
+- 단계: **Gate 1 진행 중** — 데이터 · 모델 · 연결 구조 · 고속화 · 학습 루프 · 대기열 완료. R1 진단 실행에서 Grokking 확인(T-010). 다음은 원장 연결(열린 질문 2 · 3) 뒤 Gate 2 R1 10 Seeds
 - 대상 환경: 본체 desktop-5070 (RTX 5070 Ti 16GB, `C:\critical-connectivity`, conda `critconn`) — 실측 `env/hw-20261125.md`
 - 주 실행자: 사람 + Claude Code · Codex
 
@@ -27,8 +27,8 @@
 2b. ~~Cross-Model · Parallel-Mixing · Router · Adapter · 마스크~~ → `feat/conn-cross` (Adapter 3,612,672 · Router 18,496, `scripts/count_params.py`)
 2c. Top-2 · Top-4 Router (EXP-04 · P4 전), 가지치기 (EXP-05)
 3. ~~처리량 벤치마크 · Cross-Model 속도~~ → `upgrade/fast-step` 예비 실측 (T-009 해결: Cross-Model 6.9×, 동시 실행 이득 없음). 남은 것: 측정 전 정리(`prep-measure -Apply`, 사람 승인) 뒤 공식 측정 → 기획서 §15.1 확정
-3b. 학습 루프(`src/training/`) + 작업 대기열 한 줄(64M급 하나씩, R1 · Dense-8M 은 Seed 묶음), 조기 종료 규칙 여부 (열린 질문 11)
-4. 원장 열 · run_id 규칙 확정 (열린 질문 2, 3)
+3b. ~~학습 루프 + 작업 대기열 + 조기 종료~~ → `feat/train-loop` (Seed 묶음 학습은 아직 — R1 · Dense-8M 용, 필요하면 추가)
+4. 원장 열 · run_id 규칙 확정 (열린 질문 2, 3) → 학습 루프의 `summary.json` 을 원장 행으로 쓰는 `record` 연결 → Gate 2 R1 10 Seeds · R2 음성 대조
 5. (보조) EXP-11 학습 나이테 MVP — Pythia-160M 공개 체크포인트 8개 (기획서 v0.6 §28.6). 다운로드 승인 전에는 시작하지 않는다 (열린 질문 10)
 
 ## 사람에게 요청한 것
@@ -69,6 +69,9 @@
 | 2026-11-26 | 군집 모델 기본 구현은 블록 풀 묶음 계산(`impl: batched`), 어텐션은 직접 계산, 학습은 fused AdamW + CUDA Graph 기준. 블록별 계산(`impl: loop`)은 동치 테스트 기준으로 남긴다 | 사람 방향("쾌적한 실험환경 먼저") + 에이전트 구현 — T-009, `docs/throughput-20261126.md` |
 | 2026-11-26 | 묶음 계산에서 Cross-Model 의 배치에 안 쓰인 블록은 기울기 0 (None 아님) → AdamW 가 weight decay · 모멘트 감쇠를 적용한다. 막힌 교차 간선 Adapter 는 계속 기울기 None | 에이전트 결정 — 블록별 계산과 다른 점. 표준 MoE 구현과 같고, Load Balancing 아래에서는 드물다. 바꾸려면 사람 결정 |
 | 2026-11-26 | 64M급은 한 번에 하나씩 돌린다. 프로세스 동시 실행은 하지 않는다 | 실측: Windows 에서 2~6개 동시 실행 합이 약 0.92×, Parallel-Mixing 6개는 0.18× |
+| 2026-11-27 | 조기 종료: $T_{\mathrm{grok}}$ 확정 뒤 $T_{\mathrm{grok}}$ + max(지속 창, 20,000) 에서 멈춘다. 반-Grokking 은 이 관측 기간 안에서만 판정 | 사람 결정 (권장안, 열린 질문 11) — 20,000 은 §12B-3 의 +5K · +20K 관측. 기획서 §10.2 v0.6 |
+| 2026-11-27 | R1 초기화는 1/√d_model (0.0884). 다른 모델은 0.02 그대로 (열린 질문 12) | 에이전트 결정 — T-010: 0.02 로는 100K 안에 Grokking 안 함, 1/√d 는 T_grok ≈ 3,200. 2026-11-26 초기화 결정의 R1 예외 |
+| 2026-11-27 | 학습 정밀도 기본 bf16(로짓 FP32), `precision: fp32` 선택 가능. 원장 쓰기 전까지 학습 결과는 `summary.json` 으로 남긴다 | 에이전트 결정 — R1 진단에서 bf16 · fp32 의 T_grok 차이 100 스텝 (3,300 · 3,200) |
 
 ## 열린 질문
 
@@ -80,7 +83,7 @@
 | 5 | 사전등록 이후 `src/analysis/` 변경에 `Deviation:` 트레일러를 훅으로 강제할지 | 강제 (RULES 4 가 지금은 사람 확인뿐) | Gate 2.5 | 운영 규칙 원칙 3 |
 | 6 | 라이선스 | 미정 — 없으면 공개 저장소라도 재사용 권한이 없다 | 외부 공개 · 인용 | 기획서 §22.1-4, §27.3 (GPL RFM 코드 사용 여부와 연동) |
 | 10 | EXP-11 MVP 실행 시점과 Pythia 체크포인트 다운로드(약 2.6GB) | Gate 1 벤치마크 뒤 | EXP-11 MVP | 기획서 v0.6 §22.1-9 |
-| 11 | 조기 종료: §10.2 지속성(max(5,000, 0.5·$T_{\mathrm{grok}}$)) 확인 뒤 $S_{\max}$ 전에 멈출지 | 멈춘다 — 실측 기준 Core 직렬 약 280 GPU시간을 크게 줄인다. 중도절단 · 반-Grokking 판정에 필요한 관측 기간은 사전등록에 함께 정한다 | Gate 2.5 사전등록, 일정 | 기획서 §10.2, §15.1 v0.6 예비 실측 |
+| 12 | 8M · 64M 계열 초기화 스케일 (지금 0.02) | 파일럿(P1)에서 1/√d 와 비교해 정한다 — R1 은 0.02 로 Grokking 하지 않았다(T-010) | P1 · Gate 2.5 | 기획서 §9 EXP-01 (초기화 스케일 기록), [16] |
 
 ## 에이전트 사용
 
@@ -89,6 +92,7 @@
 
 ## 최근 변경
 
+- 2026-11-27 · Claude Code · 학습 루프 (`feat/train-loop`): 조기 종료 판정 · CUDA Graph 학습 · 평가 · t0/grok/final 저장 · 재개 · Parquet 지표 · summary.json, `scripts/train.py` · `run_queue.py`, `configs/train/`. 본체 R1 진단으로 초기화 문제 발견 · 수정(T-010), 열린 질문 11 해소 · 12 추가
 - 2026-11-27 · Claude Code · 처리량 문서에 모델별 자원 사용(VRAM 0.4~4.0GB · RAM 1.5~2.2GB · CPU 약 1코어 · GPU 포화) 추가
 - 2026-11-26 · Claude Code · 학습 스텝 고속화 (`upgrade/fast-step`, T-009 해결): 블록 풀 묶음 계산 · 직접 어텐션 · Router 동기화 제거 → CUDA Graph. Cross-Model 237.7 → 34.4 ms(배치 512), 기본 설정(배치 256)에서 100K 스텝 34분. 동시 실행 · Seed 묶음 실측, 벤치 도구 3개, 기획서 §15.1 예비 실측 반영
 - 2026-11-26 · Claude Code · 정돈: 문서의 기획서 참조를 v0.6 으로, README · AGENTS 현재 단계 · tests · configs · scripts README 갱신, TROUBLESHOOTING T-009(Cross-Model 스텝 시간) 추가, 본체 임시 파일 · 머지된 브랜치 정리
