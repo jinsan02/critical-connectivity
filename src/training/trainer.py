@@ -90,14 +90,19 @@ def trainable_parameters(model: nn.Module) -> list:
     return [p for p in model.parameters() if p.requires_grad and id(p) not in blocked]
 
 
-def _git() -> tuple[str, int]:
+# 학습 스크립트가 저장소 안에 쓰는 기록 출력. 코드 변경이 아니므로 git_dirty 에서 뺀다 (T-011).
+RECORD_OUTPUTS = ("experiments/LEDGER.tsv", "experiments/runs")
+
+
+def _git(root: Path = ROOT) -> tuple[str, int]:
     try:
         sha = subprocess.run(
-            ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True
+            ["git", "rev-parse", "HEAD"], cwd=root, capture_output=True, text=True, check=True
         ).stdout.strip()
         dirty = subprocess.run(
-            ["git", "status", "--porcelain", "--untracked-files=no"],
-            cwd=ROOT,
+            ["git", "status", "--porcelain", "--untracked-files=no", "--", "."]
+            + [f":(exclude){p}" for p in RECORD_OUTPUTS],
+            cwd=root,
             capture_output=True,
             text=True,
             check=True,

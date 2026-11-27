@@ -4,8 +4,8 @@
 
 ## 지금
 
-- 마지막 갱신: 2026-11-26
-- 단계: **Gate 1 진행 중** — 데이터 · 모델 · 연결 구조 · 고속화 · 학습 루프 · 대기열 · 원장 연결 완료. 남은 것: 공식 처리량 측정(측정 전 정리 승인). 다음은 Gate 2 R1 10 Seeds
+- 마지막 갱신: 2026-11-27
+- 단계: **Gate 2 통과** — R1 10 Seeds 모두 Grokking, R2 음성 대조 우연 수준 · 양성 대조 빠른 일반화. Gate 1 남은 것: 공식 처리량 측정(측정 전 정리 승인). 다음은 파일럿 P1 → Gate 2.5
 - 대상 환경: 본체 desktop-5070 (RTX 5070 Ti 16GB, `C:\critical-connectivity`, conda `critconn`) — 실측 `env/hw-20261125.md`
 - 주 실행자: 사람 + Claude Code · Codex
 
@@ -16,7 +16,7 @@
 | 저장소 세팅 | S0 | 완료 | 뼈대 · 훅 · CI · 템플릿, CI 초록 | 커밋 2139236 |
 | 환경 구축 | E0 | 완료 | `critconn` 설치, 버전 고정, `env/hw-*.md`, 본체 verify 통과 | `env/hw-20261125.md`, `env/install-critconn-20261125-try*.log` |
 | Gate 1 | G1 | 진행 중 | 파라미터 수 · 분할 무결성 · 숫자 빈도 pytest, 1K 스텝 처리량 · VRAM · 동시 수 실측 | 기획서 §12B-7, §15.1 |
-| Gate 2 | G2 | 미착수 | R1 10 Seeds 중 8개 이상 Grokking, R2 우연 수준 | §12B-7 |
+| Gate 2 | G2 | 완료 | R1 10 Seeds 중 8개 이상 Grokking, R2 우연 수준 | 원장 `p0_r1_*` · `p0_r2_*` (16 run), 이슈 #12 |
 | Gate 2.5 | G2.5 | 미착수 | $S_{\max}$ · 하이퍼파라미터 확정, 사전등록 · `prereg-v1` | §17 |
 | Gate 3~7 | G3–G7 | 미착수 | 기획서 §17 | §17 |
 
@@ -28,8 +28,9 @@
 2c. Top-2 · Top-4 Router (EXP-04 · P4 전), 가지치기 (EXP-05)
 3. ~~처리량 벤치마크 · Cross-Model 속도~~ → `upgrade/fast-step` 예비 실측 (T-009 해결: Cross-Model 6.9×, 동시 실행 이득 없음). 남은 것: 측정 전 정리(`prep-measure -Apply`, 사람 승인) 뒤 공식 측정 → 기획서 §15.1 확정
 3b. ~~학습 루프 + 작업 대기열 + 조기 종료~~ → `feat/train-loop` (Seed 묶음 학습은 아직 — R1 · Dense-8M 용, 필요하면 추가)
-4. ~~원장 열 · run_id 규칙 확정~~ → `feat/ledger-record` (LEDGER_SCHEMA v1, 학습 스크립트가 원장 행을 씀). 다음: **Gate 2 — R1 10 Seeds (P0) · R2 음성 대조**
+4. ~~원장 열 · run_id 규칙 확정~~ → `feat/ledger-record` (LEDGER_SCHEMA v1, 학습 스크립트가 원장 행을 씀). ~~Gate 2 — R1 10 Seeds (P0) · R2 음성 대조~~ → `exp/p0-gate2` 통과 (R1 10/10, T-011 git_dirty 수정)
 5. (보조) EXP-11 학습 나이테 MVP — Pythia-160M 공개 체크포인트 8개 (기획서 v0.6 §28.6). 다운로드 승인 전에는 시작하지 않는다 (열린 질문 10)
+6. 파일럿 P1 — 8M · 64M 계열 $S_{\max}$ · 학습률 · 초기화 스케일(열린 질문 12) → Gate 2.5 사전등록
 
 ## 사람에게 요청한 것
 
@@ -73,6 +74,8 @@
 | 2026-11-27 | R1 초기화는 1/√d_model (0.0884). 다른 모델은 0.02 그대로 (열린 질문 12) | 에이전트 결정 — T-010: 0.02 로는 100K 안에 Grokking 안 함, 1/√d 는 T_grok ≈ 3,200. 2026-11-26 초기화 결정의 R1 예외 |
 | 2026-11-27 | 학습 정밀도 기본 bf16(로짓 FP32), `precision: fp32` 선택 가능. 원장 쓰기 전까지 학습 결과는 `summary.json` 으로 남긴다 | 에이전트 결정 — R1 진단에서 bf16 · fp32 의 T_grok 차이 100 스텝 (3,300 · 3,200) |
 | 2026-11-27 | 원장 열 v1 = 초안 v0 + `stop_reason` · `anti_grok`. Router 엔트로피 등은 Parquet 에만 | 사람 결정 (권장안, 열린 질문 2) — 두 열은 조기 종료 결정으로 생긴 정보 |
+| 2026-11-27 | Gate 2 통과: R1 10/10 Grokking ($T_{\mathrm{grok}}$ 3,300~6,900, 중앙값 5,850), R2 음성(Train 무작위 라벨) Test 0.0088~0.0093 = 우연 1/113 ≈ 0.0088 (±2%p 안, Train 은 100% 암기), R2 양성(Train 90%) $T_{\mathrm{grok}}$ 200 | 기획서 §12B-7, 원장 16 run (커밋 d6b4f19) |
+| 2026-11-27 | `git_dirty` 는 기록 출력(`experiments/LEDGER.tsv` · `experiments/runs/`)을 빼고 코드 변경만 본다 | 에이전트 결정 — T-011. Gate 2 16 run 의 `git_dirty 1` 은 원장 쓰기 때문이며 코드는 d6b4f19 그대로 |
 | 2026-11-27 | run_id = `<phase>_<exp>_<arch>_<변형>_i<init>m<mask>o<order>`, 학습 스크립트가 만든다 (arch 짧은 이름, 변형 `r<ρ>`/`base`, mask 없으면 `x`) | 사람 결정 (권장안, 열린 질문 3) — STRUCTURE 5절 |
 
 ## 열린 질문
@@ -92,6 +95,7 @@
 
 ## 최근 변경
 
+- 2026-11-27 · Claude Code · **Gate 2 통과** (`exp/p0-gate2`): R1 10 Seeds 10/10 Grokking, R2 음성 우연 수준 · 양성 $T_{\mathrm{grok}}$ 200, 원장 16 run 기록. 대기열이 원장 쓰기로 `git_dirty` 를 1 로 만드는 문제 수정(T-011)
 - 2026-11-27 · Claude Code · 원장 연결 (`feat/ledger-record`): LEDGER_SCHEMA v1 확정, run_id 자동 생성, `train.py` · `run_queue.py` 가 원장에 start · ok/fail 행을 씀. 열린 질문 2 · 3 해소
 - 2026-11-27 · Claude Code · 학습 루프 (`feat/train-loop`): 조기 종료 판정 · CUDA Graph 학습 · 평가 · t0/grok/final 저장 · 재개 · Parquet 지표 · summary.json, `scripts/train.py` · `run_queue.py`, `configs/train/`. 본체 R1 진단으로 초기화 문제 발견 · 수정(T-010), 열린 질문 11 해소 · 12 추가
 - 2026-11-27 · Claude Code · 처리량 문서에 모델별 자원 사용(VRAM 0.4~4.0GB · RAM 1.5~2.2GB · CPU 약 1코어 · GPU 포화) 추가

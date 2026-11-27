@@ -18,6 +18,7 @@
 
 | # | 날짜 | 제목 | 영역 | 상태 |
 | --- | --- | --- | --- | --- |
+| T-011 | 11-27 | 대기열의 원장 쓰기 때문에 이후 run 이 모두 `git_dirty 1` 로 기록됨 | train · infra | 해결 (기록 출력 경로를 검사에서 제외) |
 | T-010 | 11-27 | R1 이 [8] 설정으로 100K 스텝 안에 Grokking 하지 않음 — 초기화 스케일 | train · model | 해결 (R1 init_std 1/√d) |
 | T-009 | 11-26 | Cross-Model 학습 스텝이 Dense-64M 보다 약 8배 느림 (간이 측정) | conn · model | 해결 (묶음 계산 · CUDA Graph, 6.9×) |
 | T-008 | 11-26 | `.gitignore` 의 `data/` 가 `configs/data/` 까지 숨겨 분할 설정이 커밋되지 않음, CI 해시 테스트는 건너뜀 | data · infra | 해결 (6c71bf7, PR #2) |
@@ -47,6 +48,23 @@
 ```
 
 ---
+
+## T-011 대기열의 원장 쓰기 때문에 이후 run 이 모두 `git_dirty 1` 로 기록됨
+- 날짜 · 단계 · 영역: 11-27 · G2 · train · infra
+- 상태: 해결 — `_git()` 이 `experiments/LEDGER.tsv` · `experiments/runs/` 를 빼고 검사한다
+### 발생 로그
+Gate 2 대기열(`configs/queue/p0_gate2.yaml`, 16 run, 커밋 d6b4f19, 브랜치 `exp/p0-gate2`)의 원장 32행 중 첫 run 의 start 행만 `git_dirty 0`, 나머지 31행은 `1`.
+대기열이 끝난 뒤 `git diff --stat` 은 `experiments/LEDGER.tsv | 32 +` 한 줄뿐이었다 (추적 파일 중 코드 변경 없음).
+### 상황 분석
+`_git()` 이 `git status --porcelain --untracked-files=no` 로 저장소 전체를 봤다. `run_job` 이 첫 run 을 시작하며 원장(추적 파일)에 start 행을 쓰므로, 그 뒤의 모든 행이 dirty 로 찍혔다.
+`experiments/runs/` 는 추적하지 않는 새 파일이라 `--untracked-files=no` 에 걸리지 않았다. 원인은 위 diff 로 확인했다.
+### 영향
+- 무효가 된 run 은 없다. 16 run 모두 코드는 d6b4f19 그대로였다 (위 diff).
+- 원장은 추가만 하므로 행을 고치지 않는다. 이 16 run 의 `git_dirty 1` 은 이 항목으로 해석한다.
+### 개선 · 조치
+- 기록 출력 경로(`RECORD_OUTPUTS`)를 git 검사에서 뺐다. 코드 변경은 그대로 dirty 로 잡는다. 회귀 테스트 `test_git_dirty_ignores_record_outputs`.
+### 재발 방지
+- record 커밋 전에 첫 행만이 아니라 대기열 전체 행의 기록 필드(`git_commit` · `git_dirty` · `config_sha256`)를 훑는다.
 
 ## T-010 R1 이 [8] 설정으로 100K 스텝 안에 Grokking 하지 않음 — 초기화 스케일
 - 날짜 · 단계 · 영역: 11-27 · G1 · train · model
