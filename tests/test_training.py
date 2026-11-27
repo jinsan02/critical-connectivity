@@ -313,3 +313,26 @@ def test_git_dirty_ignores_record_outputs(tmp_path):
 
     (tmp_path / "code.py").write_text("x = 2\n")
     assert _git(tmp_path)[1] == 1
+
+
+def test_p1_queue_grid():
+    """P1: 아키텍처 7종 × 같은 12회 격자, run_id 중복 없음 (docs/p1-pilot.md)."""
+    from collections import Counter  # noqa: PLC0415
+
+    from scripts.run_queue import load_queue  # noqa: PLC0415
+
+    jobs = load_queue(ROOT / "configs" / "queue" / "p1_b1.yaml") + load_queue(
+        ROOT / "configs" / "queue" / "p1_rest.yaml"
+    )
+    ids = [j["run_id"] for j in jobs]
+    assert len(ids) == 84 and len(set(ids)) == 84
+    assert ids[0] == "p1_exp01_dense8m_h01_i0mxo0"
+    assert "p1_exp01_cross_r1-h12_i0m0o0" in ids
+    per_arch = Counter(j["model"].name for j in jobs)
+    assert len(per_arch) == 7 and set(per_arch.values()) == {12}
+    assert all(len(j["sets"]) == 3 for j in jobs)
+    lrwd = {}
+    for j in jobs:
+        key = tuple(s for s in j["sets"] if s.startswith("train."))
+        lrwd.setdefault(j["model"].name, []).append(key)
+    assert len({tuple(v) for v in lrwd.values()}) == 1  # 모든 아키텍처가 같은 lr × wd 순서
