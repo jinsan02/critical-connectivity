@@ -241,6 +241,8 @@ def test_queue_runs_then_skips_done(tmp_path, capsys):
         ]
         == 1
     )
+    ledger = (out / "experiments" / "LEDGER.tsv").read_text("utf-8").splitlines()
+    assert [ln.split("	")[4] for ln in ledger[1:]] == ["start", "ok", "start", "ok"]
     capsys.readouterr()
     assert queue_main([str(q), "--out", str(out), "--dry-run"]) == 0
     assert "남은 것 0개" in capsys.readouterr().out

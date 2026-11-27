@@ -66,7 +66,7 @@ critical-connectivity/
 | 대상 | 규칙 | 예 |
 | --- | --- | --- |
 | 파일 · 폴더 · 식별자 | 영어 소문자, `_` | `cross_model.py` |
-| run_id | (권장, Gate 1 에서 확정) `<phase>_<exp>_<arch>_<변형>_i<init>m<mask>o<order>` | `p2_exp02_cross_r0.04_i1m2o0` |
+| run_id | (2026-11-27 확정) `<phase>_<exp>_<arch>_<변형>_i<init>m<mask>o<order>`. arch 는 짧은 이름(`src/training/ledger.py` `ARCH_CODES`), 변형은 밀도 `r<ρ>` 또는 `base`, mask 가 없으면 `x`. 학습 스크립트가 만든다 | `p2_exp02_cross_r0.04_i1m2o0` · `p0_r1_r1_base_i3mxo0` |
 | 브랜치 | `exp/<phase>-<slug>` · `feat/<scope>-<slug>` · `fix/<slug>` · `docs/<slug>` | `exp/p0-r1-anchor` |
 | 커밋 | `<type>(<scope>): <제목>` | `feat(data): 모듈러 덧셈 생성기와 분할을 더한다` |
 | 문서 | 기준 문서는 대문자(`RULES.md`), 기록은 `<주제>-YYYYMMDD.md` | `docs/throughput-20261126.md` |

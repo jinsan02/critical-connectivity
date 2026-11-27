@@ -33,6 +33,7 @@ from torch import nn
 from src.models import build_model, weight_norm
 from src.training.data import epoch_order, load_splits
 from src.training.early_stop import EarlyStopConfig, GrokTracker
+from src.training.ledger import ARCH_CODES
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -368,27 +369,46 @@ class Trainer:
         (self.paths.ckpt_dir / "resume.pt").unlink(missing_ok=True)
         return summary
 
-    def _summary(self, stop_reason: str, wall_s: float, sps: float, resumed: bool) -> dict:
-        mc, tr = self.model_cfg, self.tracker
-        last = self.rows[-1]
+    def env(self) -> dict:
+        return {
+            "torch": torch.__version__,
+            "python": platform.python_version(),
+            "gpu": torch.cuda.get_device_name(0) if self.cuda else None,
+        }
+
+    def base_fields(self) -> dict:
+        """학습 전에 정해지는 값 (원장 start 행 · 요약 공통)."""
+        mc = self.model_cfg
         sha, dirty = _git()
         fr = self.data_cfg["split"]["fractions"]
+        dens = mc.get("kind") in ("parallel_mixing", "cross_model")
         return {
             "run_id": self.run_id,
-            "arch": mc.get("name"),
+            "arch": ARCH_CODES.get(mc.get("name"), mc.get("name")),
+            "arch_name": mc.get("name"),
             "arch_id": mc.get("id"),
             "task": self.data_cfg.get("name"),
             "p": self.p,
             "train_frac": float(fr.get("train", math.nan)),
-            "rho": mc.get("density")
-            if mc.get("kind") in ("parallel_mixing", "cross_model")
-            else None,
-            "router": mc.get("router"),
+            "rho": mc.get("density") if dens else None,
+            "router": mc.get("router") if mc.get("kind") == "cross_model" else None,
             "split_seed": self.data_cfg["split"]["seed"],
             "init_seed": self.cfg.init_seed,
-            "mask_seed": mc.get("mask_seed"),
+            "mask_seed": mc.get("mask_seed") if dens else None,
             "order_seed": self.cfg.order_seed,
             "s_max": self.cfg.s_max,
+            "git_commit": sha,
+            "git_dirty": dirty,
+            "config_sha256": _sha(self.resolved_config()),
+            "env_sha256": _sha(self.env()),
+            "concurrent": 1,
+        }
+
+    def _summary(self, stop_reason: str, wall_s: float, sps: float, resumed: bool) -> dict:
+        tr = self.tracker
+        last = self.rows[-1]
+        return {
+            **self.base_fields(),
             "steps_done": self.step,
             "t_mem": tr.t_mem,
             "t0": tr.t0,
@@ -407,15 +427,8 @@ class Trainer:
             "wall_s": wall_s,
             "batch_size": self.batch,
             "cuda_graph": int(self.use_graph),
-            "git_commit": sha,
-            "git_dirty": dirty,
-            "config_sha256": _sha(self.resolved_config()),
             "split_sha256": self.split_sha,
-            "env": {
-                "torch": torch.__version__,
-                "python": platform.python_version(),
-                "gpu": torch.cuda.get_device_name(0) if self.cuda else None,
-            },
+            "env": self.env(),
         }
 
     def _write(self, summary: dict) -> None:

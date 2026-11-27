@@ -11,7 +11,7 @@
 | `bench_concurrency.py` | 프로세스 k 개 동시 실행의 steps/s 합 (같은 시각 시작, 고정 시간 창) |
 | `bench_seed_batch.py` | 한 프로세스 안 Seed K 개 묶음(vmap) 처리량 |
 
-| `train.py` | 실행 하나 학습 (`--set 영역.키=값` 덮어쓰기, 재개 파일 있으면 이어서) |
+| `train.py` | 실행 하나 학습 + 원장 start · ok/fail 행 (`--phase` · `--exp` 로 run_id 자동, `--set 영역.키=값` 덮어쓰기, 재개 파일 있으면 이어서) |
 | `run_queue.py` | 대기열 파일의 실행을 한 줄로 차례대로 (끝난 것은 건너뛰고 중단된 것은 재개) |
 
 측정 기록은 `docs/throughput-YYYYMMDD.md`. 평가 · 분석 스크립트는 예정이다.

@@ -19,7 +19,7 @@
 
 ## 3. 실행
 
-- 학습 스크립트가 시작할 때 `status=start`, 끝날 때 `ok` 또는 `fail` 행을 원장에 쓴다.
+- 학습 스크립트(`scripts/train.py` · `run_queue.py`)가 시작할 때 `status=start`, 끝날 때 `ok` 또는 `fail` 행을 원장에 쓴다. run_id 는 `--phase` · `--exp` 와 설정으로 만든다 (STRUCTURE 5절). 저장소 밖 시험 실행은 `--out` 을 다른 폴더로 준다.
 - 동시 실행 수는 Gate 1 실측값을 따른다 (기획서 §15.1). 데이터셋은 GPU 에 올리고 DataLoader 작업 프로세스는 쓰지 않는다.
 - 체크포인트·지표는 git 밖(`checkpoints/`, `results/metrics/`)에 둔다. 저장 정책은 기획서 §15.2.
 
