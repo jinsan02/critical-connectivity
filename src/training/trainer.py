@@ -358,6 +358,7 @@ class Trainer:
                     break
             if self.step % self.cfg.ckpt_every == 0:
                 self.save_resume(wall())
+                self._write_metrics()  # 진행 중에도 그림을 그릴 수 있게
             if stop_after is not None and self.step >= stop_after:
                 self.save_resume(wall())
                 return None
@@ -436,12 +437,15 @@ class Trainer:
             "env": self.env(),
         }
 
-    def _write(self, summary: dict) -> None:
+    def _write_metrics(self) -> None:
         import polars as pl  # noqa: PLC0415
 
-        self.paths.run_dir.mkdir(parents=True, exist_ok=True)
         self.paths.metrics.parent.mkdir(parents=True, exist_ok=True)
         pl.DataFrame(self.rows).write_parquet(self.paths.metrics)
+
+    def _write(self, summary: dict) -> None:
+        self.paths.run_dir.mkdir(parents=True, exist_ok=True)
+        self._write_metrics()
         (self.paths.run_dir / "config.json").write_text(
             json.dumps(self.resolved_config(), ensure_ascii=False, indent=2, default=str) + "\n",
             encoding="utf-8",
