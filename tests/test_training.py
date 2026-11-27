@@ -246,3 +246,41 @@ def test_queue_runs_then_skips_done(tmp_path, capsys):
     capsys.readouterr()
     assert queue_main([str(q), "--out", str(out), "--dry-run"]) == 0
     assert "남은 것 0개" in capsys.readouterr().out
+
+
+# ---- R2 무작위 정답 (§12A-1) ----
+
+
+def test_random_labels_shuffle_train_only():
+    from src.training.data import load_splits  # noqa: PLC0415
+
+    r1 = load_config(ROOT / "configs" / "data" / "r1_add113.yaml")
+    neg = load_config(ROOT / "configs" / "data" / "r2neg_add113.yaml")
+    _, true, h1 = load_splits(r1, "cpu")
+    _, rnd, h2 = load_splits(neg, "cpu")
+    _, rnd2, _ = load_splits(neg, "cpu")
+    assert h1 == h2  # 분할은 같다
+    assert torch.equal(true["train"].x, rnd["train"].x)
+    assert torch.equal(rnd["train"].y, rnd2["train"].y)  # seed 로 결정적
+    assert torch.equal(true["train"].y.sort().values, rnd["train"].y.sort().values)  # 분포 그대로
+    agree = (true["train"].y == rnd["train"].y).float().mean().item()
+    assert agree < 0.05  # 섞였다 (우연 일치 약 1/113)
+    assert torch.equal(true["test"].y, rnd["test"].y)  # 평가 정답은 그대로
+
+
+def test_bad_label_mode_rejected():
+    from src.training.data import shuffled_splits  # noqa: PLC0415
+
+    with pytest.raises(ValueError):
+        shuffled_splits({"labels": {"mode": "noise"}})
+    assert shuffled_splits({}) == {}
+
+
+def test_gate2_queue_run_ids():
+    from scripts.run_queue import load_queue  # noqa: PLC0415
+
+    jobs = load_queue(ROOT / "configs" / "queue" / "p0_gate2.yaml")
+    ids = [j["run_id"] for j in jobs]
+    assert len(ids) == 16 and len(set(ids)) == 16
+    assert ids[0] == "p0_r1_r1_base_i0mxo0" and "p0_r2_r1_neg_i2mxo0" in ids
+    assert "p0_r2_r1_pos_i0mxo0" in ids
