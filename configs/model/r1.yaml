@@ -8,5 +8,5 @@ n_heads: 4
 d_ff: 512
 norm: none
 act: relu
-init_std: 0.02
+init_std: 0.0884 # 1/√d_model. 0.02 로는 100K 안에 Grokking 하지 않았다 (TROUBLESHOOTING T-010)
 design_params: 196608 # 12·d²·L
