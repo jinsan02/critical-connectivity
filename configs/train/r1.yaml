@@ -1,0 +1,21 @@
+# R1 재현 앵커 — Nanda et al. [8] 설정 (§12A-1): Full-batch, AdamW lr 1e-3, wd 1.0, betas (0.9, 0.98)
+# R1 데이터(r1_add113)는 Train 30% / Test 70% 뿐이라 평가 분할은 test 다 ([8] 과 같음).
+lr: 1.0e-3
+weight_decay: 1.0
+betas: [0.9, 0.98]
+batch_size: full
+s_max: 100000
+eval_every: 100
+grad_clip: null # [8] 은 클리핑 없음
+eval_split: test
+ckpt_every: 5000
+init_seed: 0
+order_seed: 0
+cuda_graph: true
+early_stop:
+  enabled: true
+  grok_acc: 0.95
+  hold_acc: 0.90
+  min_window: 5000
+  rel_window: 0.5
+  post_grok_steps: 20000

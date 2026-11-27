@@ -1,0 +1,20 @@
+# 기본 학습 설정 — 기획서 v0.6 §14 초기 학습 설정 (파일럿 초기값, Gate 2.5 에서 확정)
+lr: 3.0e-4
+weight_decay: 0.1
+betas: [0.9, 0.999] # 기획서에 없음 — PyTorch 기본값
+batch_size: 256
+s_max: 100000 # §12B-5 최소 100K (R1 Grokking 스텝의 5배 이상으로 Gate 2.5 에서 확정)
+eval_every: 100
+grad_clip: 1.0
+eval_split: val
+ckpt_every: 5000 # 재개용 체크포인트 덮어쓰기 간격 (§15.2)
+init_seed: 0
+order_seed: 0
+cuda_graph: true
+early_stop: # §10.2 + 조기 종료 (STATE 결정 2026-11-27)
+  enabled: true
+  grok_acc: 0.95
+  hold_acc: 0.90
+  min_window: 5000
+  rel_window: 0.5
+  post_grok_steps: 20000 # §12B-3 T_grok+5K · +20K 관측

@@ -1,0 +1,11 @@
+# 대기열 예시 — scripts/run_queue.py. run_id 이름 규칙은 STATE 열린 질문 3 이 정해지면 따른다.
+defaults:
+  data: configs/data/r1_add113.yaml
+  train: configs/train/r1.yaml
+jobs:
+  - run_id: example_r1_i0
+    model: configs/model/r1.yaml
+    set: {train.init_seed: 0}
+  - run_id: example_r1_i1
+    model: configs/model/r1.yaml
+    set: {train.init_seed: 1}
