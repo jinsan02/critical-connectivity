@@ -92,10 +92,25 @@ def main(argv=None) -> int:
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--stop-on-error", action="store_true")
     ap.add_argument("--device")
+    ap.add_argument("--no-collect", action="store_true", help="끝난 뒤 산출물 모으기를 건너뛴다")
     args = ap.parse_args(argv)
+    log = None
+    if not args.dry_run:
+        # 대기열 화면 출력도 산출물이다: experiments/logs/<대기열>-<시각>.log (커밋 대상)
+        stamp = time.strftime("%Y%m%d-%H%M%S")
+        log_path = args.out / "experiments" / "logs" / f"{args.queue.stem}-{stamp}.log"
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        log = log_path.open("a", encoding="utf-8")
+
+    def say(msg: str) -> None:
+        print(msg, flush=True)
+        if log:
+            log.write(time.strftime("%Y-%m-%d %H:%M:%S ") + msg + "\n")
+            log.flush()
+
     jobs = load_queue(args.queue)
     todo = [j for j in jobs if status(j, args.out) != "완료"]
-    print(f"대기열 {args.queue.name}: {len(jobs)}개 중 남은 것 {len(todo)}개", flush=True)
+    say(f"대기열 {args.queue.name}: {len(jobs)}개 중 남은 것 {len(todo)}개")
     if args.dry_run:
         for j in jobs:
             print(
@@ -105,7 +120,7 @@ def main(argv=None) -> int:
     failed = 0
     for n, j in enumerate(todo, 1):
         t = time.perf_counter()
-        print(f"[{n}/{len(todo)}] {j['run_id']} ({status(j, args.out)}) 시작", flush=True)
+        say(f"[{n}/{len(todo)}] {j['run_id']} ({status(j, args.out)}) 시작")
         try:
             s = run_job(
                 j["run_id"],
@@ -119,12 +134,11 @@ def main(argv=None) -> int:
                 j["exp"],
                 j["variant"],
             )
-            print(
+            say(
                 f"[{n}/{len(todo)}] {j['run_id']} 끝: {s['stop_reason']} · "
                 f"steps {s['steps_done']} · "
                 f"T_grok {s['t_grok']} · eval_acc {s['eval_acc']:.3f} · "
-                f"{(time.perf_counter() - t) / 60:.1f}분",
-                flush=True,
+                f"{(time.perf_counter() - t) / 60:.1f}분"
             )
         except Exception:  # noqa: BLE001 — 한 실행의 실패가 대기열 전체를 멈추지 않게
             failed += 1
@@ -138,10 +152,18 @@ def main(argv=None) -> int:
                 ),
                 encoding="utf-8",
             )
-            print(f"[{n}/{len(todo)}] {j['run_id']} 실패 → {run_dir / 'fail.json'}", flush=True)
+            say(f"[{n}/{len(todo)}] {j['run_id']} 실패 → {run_dir / 'fail.json'}")
             if args.stop_on_error:
                 return 1
-    print(f"대기열 끝: 실패 {failed}개", flush=True)
+    say(f"대기열 끝: 실패 {failed}개")
+    if not args.no_collect:
+        from scripts.collect_outputs import collect  # noqa: PLC0415
+
+        rows = collect(args.out)
+        lacking = [r for r in rows if r["missing"]]
+        say(f"산출물 모으기: run {len(rows)}개, 빠진 것 있는 run {len(lacking)}개")
+    if log:
+        log.close()
     return 1 if failed else 0
 
 

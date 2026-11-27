@@ -12,8 +12,9 @@
 | `bench_seed_batch.py` | 한 프로세스 안 Seed K 개 묶음(vmap) 처리량 |
 
 | `train.py` | 실행 하나 학습 + 원장 start · ok/fail 행 (`--phase` · `--exp` 로 run_id 자동, `--set 영역.키=값` 덮어쓰기, 재개 파일 있으면 이어서) |
-| `run_queue.py` | 대기열 파일의 실행을 한 줄로 차례대로 (끝난 것은 건너뛰고 중단된 것은 재개) |
+| `run_queue.py` | 대기열 파일의 실행을 한 줄로 차례대로 (끝난 것은 건너뛰고 중단된 것은 재개). 화면 출력은 `experiments/logs/<대기열>-<시각>.log` 에도 남는다 |
 
+| `collect_outputs.py` | 끝난 run 의 산출물을 모은다: 지표 Parquet 을 `experiments/runs/<run_id>/metrics.parquet` 로 복사, 가중치 목록 · sha256 을 `artifacts.json` 에, 전체 목록 `experiments/ARTIFACTS.tsv` (`run_queue.py` 가 끝날 때 자동 실행) |
 | `plot_runs.py` | run 묶음 학습 곡선 그림 → `results/figures/<name>/` (정확도 · $T_{grok}$ · 가중치 노름, 진행 중 run 포함) |
 
 측정 기록은 `docs/throughput-YYYYMMDD.md`. 그림 예:
