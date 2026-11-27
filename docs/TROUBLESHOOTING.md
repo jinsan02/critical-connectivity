@@ -18,6 +18,7 @@
 
 | # | 날짜 | 제목 | 영역 | 상태 |
 | --- | --- | --- | --- | --- |
+| T-012 | 11-27 | 본체 critconn 에서 numpy 행렬곱이 0xC06D007F 로 프로세스째 죽음 (MKL · OpenMP) | env | 조치 중 (코드에서 SEQUENTIAL 우회, 패키지 수정은 승인 대기) |
 | T-011 | 11-27 | 대기열의 원장 쓰기 때문에 이후 run 이 모두 `git_dirty 1` 로 기록됨 | train · infra | 해결 (기록 출력 경로를 검사에서 제외) |
 | T-010 | 11-27 | R1 이 [8] 설정으로 100K 스텝 안에 Grokking 하지 않음 — 초기화 스케일 | train · model | 해결 (R1 init_std 1/√d) |
 | T-009 | 11-26 | Cross-Model 학습 스텝이 Dense-64M 보다 약 8배 느림 (간이 측정) | conn · model | 해결 (묶음 계산 · CUDA Graph, 6.9×) |
@@ -48,6 +49,31 @@
 ```
 
 ---
+
+## T-012 본체 critconn 에서 numpy 행렬곱이 0xC06D007F 로 프로세스째 죽음 (MKL · OpenMP)
+- 날짜 · 단계 · 영역: 11-27 · G2 · env
+- 상태: 조치 중 — 그림 · 테스트 진입점에서 `MKL_THREADING_LAYER=SEQUENTIAL` 로 우회. 패키지 수정은 사람 승인 대기
+### 발생 로그
+학습 곡선 그림(`scripts/plot_runs.py`)이 출력 없이 종료 코드 -1066598273(`0xC06D007F`, 지연 로드 심볼 없음)으로 끝났다.
+`python -X faulthandler` 로 보면 matplotlib `transforms.get_affine` 안에서 죽는다. 더 줄이면 `np.eye(3) @ np.eye(3)` · `np.linalg.inv` 도 같은 코드로 죽는다.
+### 상황 분석
+`MKL_THREADING_LAYER` 를 바꿔 확인했다 (64×64 행렬곱):
+
+| 값 | 결과 |
+| --- | --- |
+| (없음) · INTEL · GNU | 0xC06D007F |
+| SEQUENTIAL · TBB | 정상 |
+
+conda-forge `mkl 2026.2.1` 의 INTEL 계층이 쓰는 `libiomp5md.dll` 이 `llvm-openmp 23.1.6` 의 호환 DLL 이고, 여기에 MKL 이 찾는 심볼이 없는 것으로 **추정**한다 (어느 심볼인지는 확인하지 않음).
+값은 numpy 를 처음 불러오기 전에 정해야 한다. 불러온 뒤에 바꾸거나 torch 를 먼저 불러오면 그대로 죽는다.
+### 영향
+- 기록된 run 은 영향 없다. 학습 · 데이터 · 마스크 코드는 numpy 행렬곱을 쓰지 않고(pytest 138 통과), 학습 연산은 PyTorch 가 한다.
+- 앞으로 분석 코드(CKA · 행렬 연산 · 그림)는 모두 이 문제에 걸린다. 노트북 · CI(pip numpy, OpenBLAS)는 확인 범위 밖이다.
+### 개선 · 조치
+- `tests/conftest.py`, `scripts/plot_runs.py`, `src/analysis/curves.py` 맨 앞에서 `os.environ.setdefault("MKL_THREADING_LAYER", "SEQUENTIAL")`.
+- 남은 선택지 (환경 변경이라 사람 승인 필요): ① 본체 사용자 환경 변수로 고정 ② `env/critconn.yml` 에 BLAS 를 OpenBLAS(`libblas=*=*openblas`)로 고정하고 환경 재생성 ③ conda-forge `intel-openmp` 설치.
+### 재발 방지
+- 환경 검사(`env/hw.py` 또는 verify)에 numpy 행렬곱 한 번을 넣는다 — 이번에는 그림을 그리기 전까지 아무도 몰랐다.
 
 ## T-011 대기열의 원장 쓰기 때문에 이후 run 이 모두 `git_dirty 1` 로 기록됨
 - 날짜 · 단계 · 영역: 11-27 · G2 · train · infra

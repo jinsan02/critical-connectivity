@@ -30,7 +30,8 @@
 3b. ~~학습 루프 + 작업 대기열 + 조기 종료~~ → `feat/train-loop` (Seed 묶음 학습은 아직 — R1 · Dense-8M 용, 필요하면 추가)
 4. ~~원장 열 · run_id 규칙 확정~~ → `feat/ledger-record` (LEDGER_SCHEMA v1, 학습 스크립트가 원장 행을 씀). ~~Gate 2 — R1 10 Seeds (P0) · R2 음성 대조~~ → `exp/p0-gate2` 통과 (R1 10/10, T-011 git_dirty 수정)
 5. (보조) EXP-11 학습 나이테 MVP — Pythia-160M 공개 체크포인트 8개 (기획서 v0.6 §28.6). 다운로드 승인 전에는 시작하지 않는다 (열린 질문 10)
-6. 파일럿 P1 — 8M · 64M 계열 $S_{\max}$ · 학습률 · 초기화 스케일(열린 질문 12) → Gate 2.5 사전등록
+6. 파일럿 P1 — 8M · 64M 계열 $S_{\max}$ · 학습률 · 초기화 스케일(열린 질문 12) → Gate 2.5 사전등록. 묶음마다 `scripts/plot_runs.py` 로 그림을 남긴다
+7. 본체 numpy MKL 충돌(T-012) 영구 수정 — 환경 변경이라 사람 승인 필요
 
 ## 사람에게 요청한 것
 
@@ -95,6 +96,7 @@
 
 ## 최근 변경
 
+- 2026-11-27 · Claude Code · 학습 곡선 그림 (`feat/viz-curves`): `src/analysis/curves.py` · `scripts/plot_runs.py`, Gate 2 그림 3장(`results/figures/gate2/`), 지표 Parquet 을 `ckpt_every` 마다 저장(진행 중 run 도 그림). 본체 numpy 행렬곱 충돌 발견 · 우회(T-012)
 - 2026-11-27 · Claude Code · **Gate 2 통과** (`exp/p0-gate2`): R1 10 Seeds 10/10 Grokking, R2 음성 우연 수준 · 양성 $T_{\mathrm{grok}}$ 200, 원장 16 run 기록. 대기열이 원장 쓰기로 `git_dirty` 를 1 로 만드는 문제 수정(T-011)
 - 2026-11-27 · Claude Code · 원장 연결 (`feat/ledger-record`): LEDGER_SCHEMA v1 확정, run_id 자동 생성, `train.py` · `run_queue.py` 가 원장에 start · ok/fail 행을 씀. 열린 질문 2 · 3 해소
 - 2026-11-27 · Claude Code · 학습 루프 (`feat/train-loop`): 조기 종료 판정 · CUDA Graph 학습 · 평가 · t0/grok/final 저장 · 재개 · Parquet 지표 · summary.json, `scripts/train.py` · `run_queue.py`, `configs/train/`. 본체 R1 진단으로 초기화 문제 발견 · 수정(T-010), 열린 질문 11 해소 · 12 추가

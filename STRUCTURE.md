@@ -24,7 +24,7 @@ critical-connectivity/
 │  └─ plan/                    기준 기획서 v0.6 + 조사 문서
 ├─ env/                        conda 선언 · 설치 로그 · 하드웨어 실측
 ├─ configs/                    data · model 설정 YAML (experiments 는 예정)
-├─ src/                        datasets · models · connectivity · training (analysis 는 예정)
+├─ src/                        datasets · models · connectivity · training · analysis(학습 곡선 그림)
 ├─ scripts/                    실행 진입점 (데이터 생성 · 파라미터 표, 학습 · 분석은 예정)
 ├─ experiments/                LEDGER.tsv · runs/<run_id>/
 ├─ reports/                    보고서 · 그림
