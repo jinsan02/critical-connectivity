@@ -836,6 +836,8 @@ v0.4 정합성 수정: H1의 주 비교는 §5.7의 Parallel-Mixing과 Cross-Mod
 
 Validation 세트는 시점 판정에만 쓰고, Test 세트는 로그만 남긴 뒤 분석 코드가 동결된 다음에 연다.
 
+**v0.6 조기 종료 (2026-11-27 결정, `src/training/early_stop.py`).** $T_{\mathrm{grok}}$ 이 위 지속 조건으로 확정되면 $T_{\mathrm{grok}}+\max(\text{지속 창}, 20{,}000)$ 스텝에서 학습을 멈춘다. 20,000 은 §12B-3 의 고정 지연 시점 $T_{\mathrm{grok}}$+5K · +20K 를 관측하기 위한 값이다. 지속 창 안에서 Validation 이 90% 아래로 떨어진 후보는 버리고 다음 95% 달성을 새 후보로 삼는다. 반-Grokking($C$)은 이 사후 관측 기간 안에서만 판정하고, 관측 기간은 Gate 2.5 사전등록에 같이 적는다. $S_{\max}$ 까지 확정되지 않으면 중도절단이다. R1 데이터는 Train/Test 만 있으므로 R1 은 [8] 과 같이 Test 로 시점을 판정한다.
+
 ### 10.3 최대 성능 상승률
 
 $$t_c=\underset{t}{\arg\max}\frac{dA(t)}{dt}$$

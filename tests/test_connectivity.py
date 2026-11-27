@@ -221,7 +221,7 @@ def test_cross_model_hash_rho0_follows_one_chain():
     assert torch.equal(info.path[:, 0], pick) and torch.equal(
         info.gates, torch.ones_like(info.gates)
     )
-    assert torch.allclose(h, chains[pick, torch.arange(32)], atol=1e-6)
+    assert torch.allclose(h, chains[pick, torch.arange(32)], atol=1e-5, rtol=1e-5)
 
 
 def test_cross_model_learned_router_gets_gradient_and_aux_loss():

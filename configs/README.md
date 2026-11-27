@@ -7,4 +7,5 @@
 | `data/` | 데이터 · 분할 (p, 분할 방식, seed, 비율, 분할 해시) | `scripts/generate_dataset.py` |
 | `model/` | 아키텍처 (폭 · 층 · 헤드 · FFN · 정규화 · 활성 함수, 설계값 12d²L). 군집 모델은 `density` · `mask_seed` · `adapter_rank` · `router` 도 정한다 | `scripts/count_params.py` |
 
-남은 구성은 기획서 §16: `base.yaml`(학습 설정), `experiments/`.
+| `train/` | 학습 설정 (`base.yaml` = 기획서 §14 초기값, `r1.yaml` = [8] 설정) · 조기 종료 | `scripts/train.py` |
+| `queue/` | 대기열 파일 (`example.yaml`) | `scripts/run_queue.py --dry-run` |
