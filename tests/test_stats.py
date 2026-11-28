@@ -135,13 +135,20 @@ def test_h2_detects_informative_ceff():
 
 
 def test_router_collapse_flag_d001():
-    def rows(shares, every=100):
+    def rows(shares, every=100, layers=8):
         return [
-            {"step": i * every, "block_usage": [[s] + [(1 - s) / 7] * 7, [0.125] * 8]}
+            {"step": i * every, "block_usage": [[s] + [(1 - s) / 7] * 7] * layers}
             for i, s in enumerate(shares)
         ]
 
     assert density.router_collapse(rows([0.2] * 30)) == 0
     assert density.router_collapse(rows([0.95] * 5 + [0.2] * 30)) == 0  # 400 스텝뿐
     assert density.router_collapse(rows([0.2] * 3 + [0.95] * 11)) == 1  # 1,000 스텝
+    # 첫 층만 몰리고 다음 층이 갈라지면 붕괴가 아니다 (P1 ρ = 100% 의 정상 run)
+    one = [1.0] + [0.0] * 7
+    spread = [[one] + [[0.125] * 8] * 7 for _ in range(20)]
+    assert (
+        density.router_collapse([{"step": i * 100, "block_usage": u} for i, u in enumerate(spread)])
+        == 0
+    )
     assert density.router_collapse([{"step": 0, "block_usage": None}]) is None
