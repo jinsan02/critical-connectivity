@@ -7,6 +7,11 @@
 $T_{grok}$, 중도절단이면 학습한 마지막 스텝).
 
 밀도 좌표 x = log10(ρ + 0.005). ρ = 0 을 격자의 가장 작은 양수(1%)의 절반 자리에 둔다.
+
+Router 붕괴 표시 (D-001, `docs/deviation_log.md`): 사전등록 3절의 '엔트로피 < 0.1 nat' 대신
+층마다 가장 많이 쓰인 블록의 몫을 8개 층에 걸쳐 평균한 값이 0.9 를 넘는 상태가 1,000 스텝
+이상 이어지면 1 (거의 모든 표본이 한 경로). 첫 층만 보면 ρ = 100% 에서 첫 층은 몰려도 다음
+층에서 갈라지는 정상 run 까지 잡혀 쓰지 않는다. 표시만 하고 판정에 쓰지 않는 것은 그대로다.
 """
 
 from __future__ import annotations
@@ -26,6 +31,8 @@ MARGIN_LOG10 = 0.15  # §12B-5 동등성 허용 범위 |Δlog10 ρ_c| ≤ 0.15
 DELTA_AIC_MIN = 4.0  # §12B-5 변화점 채택 기준
 N_BOOT = 2000  # §12B-4 군집 Bootstrap
 N_BOOT_LR = 1000  # 변화점 우도비 모수 Bootstrap
+COLLAPSE_SHARE = 0.9  # D-001 Router 붕괴: 층별 최대 블록 몫의 층 평균
+COLLAPSE_STEPS = 1000  # D-001 이어진 스텝
 
 
 def to_x(rho: float) -> float:
@@ -42,10 +49,28 @@ class Rec:
     g: int  # 1 = Grokking 확정
     time: int  # 사건이면 T_grok, 아니면 마지막 스텝
     anti_grok: int
+    router_collapse: int | None = None  # D-001. Router 가 없는 모델은 None
 
     @property
     def x(self) -> float:
         return to_x(self.rho)
+
+
+def router_collapse(rows: list[dict]) -> int | None:
+    """D-001: 층별 최대 블록 몫의 층 평균 > 0.9 가 1,000 스텝 이상 이어지면 1."""
+    usage = [(r["step"], r.get("block_usage")) for r in rows]
+    usage = [(s, sum(max(layer) for layer in u) / len(u)) for s, u in usage if u]
+    if not usage:
+        return None
+    start = None
+    for step, share in usage:
+        if share > COLLAPSE_SHARE:
+            start = step if start is None else start
+            if step - start >= COLLAPSE_STEPS:
+                return 1
+        else:
+            start = None
+    return 0
 
 
 def load(root: Path, prefixes: list[str]) -> list[Rec]:
@@ -58,6 +83,13 @@ def load(root: Path, prefixes: list[str]) -> list[Rec]:
             continue
         s = json.loads(f.read_text(encoding="utf-8"))
         g = int(s["t_grok"] is not None)
+        collapse = None
+        if (d / "metrics.parquet").exists():
+            import polars as pl  # noqa: PLC0415
+
+            m = pl.read_parquet(d / "metrics.parquet")
+            if "block_usage" in m.columns:
+                collapse = router_collapse(m.select("step", "block_usage").to_dicts())
         out.append(
             Rec(
                 d.name,
@@ -68,6 +100,7 @@ def load(root: Path, prefixes: list[str]) -> list[Rec]:
                 g,
                 int(s["t_grok"] if g else s["steps_done"]),
                 int(s.get("anti_grok") or 0),
+                collapse,
             )
         )
     return out
@@ -85,6 +118,7 @@ class Condition:
     km_lo: float | None
     km_hi: float | None
     anti: int
+    collapse: int = 0  # D-001 Router 붕괴 run 수
 
 
 def conditions(recs: list[Rec]) -> list[Condition]:
@@ -109,6 +143,7 @@ def conditions(recs: list[Rec]) -> list[Condition]:
                 km.median_lo,
                 km.median_hi,
                 sum(r.anti_grok for r in rs),
+                sum(r.router_collapse or 0 for r in rs),
             )
         )
     return out

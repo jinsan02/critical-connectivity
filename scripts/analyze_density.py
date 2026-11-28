@@ -40,13 +40,14 @@ def report(recs: list[density.Rec], n_boot: int, n_boot_lr: int) -> str:
     L += [
         "## L2 조건별",
         "",
-        "| 아키텍처 | ρ | n | Grokking | 비율 95% CI | KM 중앙값 (95% CI) | 반-Grokking |",
+        "| 아키텍처 | ρ | n | Grokking | 비율 95% CI | KM 중앙값 (95% CI) | 반-Grokking "
+        "| Router 붕괴 (D-001) |",
     ]
-    L += ["| --- | ---: | ---: | ---: | --- | --- | ---: |"]
+    L += ["| --- | ---: | ---: | ---: | --- | --- | ---: | ---: |"]
     for c in density.conditions(recs):
         L.append(
             f"| {c.arch} | {c.rho:g} | {c.n} | {c.k} | {c.p_lo:.2f}–{c.p_hi:.2f} "
-            f"| {fmt(c.km_median)} ({fmt(c.km_lo)}–{fmt(c.km_hi)}) | {c.anti} |"
+            f"| {fmt(c.km_median)} ({fmt(c.km_lo)}–{fmt(c.km_hi)}) | {c.anti} | {c.collapse} |"
         )
     present = [a for a in ARCHS if any(r.arch == a for r in recs)]
     L += ["", "## L3 H3 변화점 (아키텍처별)", ""]
