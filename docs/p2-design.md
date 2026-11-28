@@ -2,7 +2,7 @@
 
 기획서 v0.6 §9 EXP-02 · §15.1 P2. 대기열 `configs/queue/p2.yaml` (60회). P1 결과는 `docs/p1-pilot.md` 9절.
 
-> **상태: 초안 (2026-11-28).** 대기열과 실행 도구는 준비됐다. 띄우기 전에 사람이 정할 것은 6절에 있다.
+> **상태: 진행 중 (2026-11-28 16:55 시작).** 6절의 두 가지는 사람이 권장안으로 정했다. 결과는 사전등록 태그 `prereg-v1` 전까지 열어 보지 않는다.
 
 ## 1. 질문
 
@@ -46,7 +46,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\launch_detached.ps1 
 3. 조건별 Grokking 확률 · Kaplan–Meier, 변화 구간 후보 → P4 의 ρ 4개 (§12B-4, 사전등록한 분석 코드로).
 4. 중도절단 비율이 30% 를 넘으면 §12B-5 대로 예산을 늘리는 안을 올린다.
 
-## 6. 띄우기 전에 정할 것 (사람)
+## 6. 띄우기 전에 정한 것 (사람, 2026-11-28)
+
+결정: 1 은 `init_seed` = `mask_seed` = s, 2 는 (나) — P2 를 먼저 띄우고 결과를 가린 채 사전등록을 끝낸다. 가리는 범위: 진행 확인 때 원장의 run_id · status 와 프로세스 · 로그 오류만 본다. $T_{grok}$ · 정확도 · 판정 · 곡선 · 그림은 태그 전까지 보지 않는다.
+
 
 1. **Seed 짝짓기**: `init_seed` = `mask_seed` = s (권장. 3개 마스크 줄 각각이 독립 Seed). 대안은 `mask_seed` 0 하나에 `init_seed` 3개 — 마스크 변동을 볼 수 없다.
 2. **사전등록과의 순서**: 기획서 §17 은 Gate 2.5 에서 가설 · 지표 · 분석 코드를 동결(`docs/preregistration.md`, 태그 `prereg-v1`)한 뒤 P2~ 를 주 데이터로 쓴다. 분석 코드(Kaplan–Meier · Cox · 변화점 · Bootstrap)는 아직 없다.
