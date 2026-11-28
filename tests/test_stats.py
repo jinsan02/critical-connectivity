@@ -132,3 +132,16 @@ def test_h2_detects_informative_ceff():
             rows.append(Row(f"c{c}", min(t, 1e5), int(t < 1e5), cov))
     r = h2(rows, n_boot=200)
     assert r.delta > 0 and r.ci[0] > 0 and r.p_value < 0.05
+
+
+def test_router_collapse_flag_d001():
+    def rows(shares, every=100):
+        return [
+            {"step": i * every, "block_usage": [[s] + [(1 - s) / 7] * 7, [0.125] * 8]}
+            for i, s in enumerate(shares)
+        ]
+
+    assert density.router_collapse(rows([0.2] * 30)) == 0
+    assert density.router_collapse(rows([0.95] * 5 + [0.2] * 30)) == 0  # 400 스텝뿐
+    assert density.router_collapse(rows([0.2] * 3 + [0.95] * 11)) == 1  # 1,000 스텝
+    assert density.router_collapse([{"step": 0, "block_usage": None}]) is None
