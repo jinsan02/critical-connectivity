@@ -11,6 +11,7 @@
 | 사람 + AI 에이전트 협업 삽질 (velog 재료) | [`COLLAB-LOG.md`](COLLAB-LOG.md) (C-NNN) |
 | 파일럿 P1 설계 · 결과 · Gate 2.5 결정 | [`p1-pilot.md`](p1-pilot.md) |
 | P2 1차 밀도 탐색 설계 | [`p2-design.md`](p2-design.md) |
+| 사전등록 (Gate 2.5) · 변경 기록 | [`preregistration.md`](preregistration.md) · [`deviation_log.md`](deviation_log.md) |
 | 무엇을 만드나 (기준 기획서) | [`plan/research_plan_v0.6.md`](plan/research_plan_v0.6.md) |
 | 데이터셋 조사 | [`plan/dataset_search_modular.md`](plan/dataset_search_modular.md) |
 | 2025~2026 신규성 검색 | [`plan/novelty_search_2025_2026.md`](plan/novelty_search_2025_2026.md) |

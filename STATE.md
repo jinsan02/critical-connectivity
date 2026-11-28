@@ -32,7 +32,7 @@
 5. (보조) EXP-11 학습 나이테 MVP — Pythia-160M 공개 체크포인트 8개 (기획서 v0.6 §28.6). 다운로드 승인 전에는 시작하지 않는다 (열린 질문 10)
 6. 파일럿 P1 — 설계 `docs/p1-pilot.md` (7종 × 12회 = 84). ~~84회 완료~~ (2026-11-28). 선택 확정 (`docs/p1-pilot.md` 9절): B-1 h11 · B-2 h12 · B-3 h11 · B-4 h04 · B-5 h11 · B-6 h12 · Cross-Model h05, 모두 wd 1.0. ~~지속 창 수정~~ (`early_stop.py` `max_window` · `confirm_extension`)
 7. **P2 1차 밀도 탐색 진행 중** (2026-11-28 16:55 시작, 60회, 상한 약 44시간) — 설계 `docs/p2-design.md`. **결과는 `prereg-v1` 태그 전까지 열어 보지 않는다** (진행 수 · 오류만 확인)
-8. **Gate 2.5 사전등록** — `docs/preregistration.md` (가설 · 지표 · 판정 · 분석 계획 · 일정 재산정) + 분석 코드(Kaplan–Meier · Cox/AFT · 변화점 · 군집 Bootstrap, `src/analysis/`) → 태그 `prereg-v1`. P2 결과를 보기 전에 끝낸다
+8. **Gate 2.5 사전등록** — 초안 `docs/preregistration.md` + 분석 코드(`src/analysis/stats.py` · `density.py` · `prediction.py` · `connectivity.py`, `scripts/analyze_density.py` · `measure_ceff.py`). 남은 것: 8절 다섯 가지 사람 결정 → 태그 `prereg-v1`. P2 결과를 보기 전에 끝낸다
 
 ## 사람에게 요청한 것
 
@@ -111,6 +111,7 @@
 
 ## 최근 변경
 
+- 2026-11-28 · Claude Code · 사전등록 초안 (`feat/prereg`): 가설 위계 · L1 사건 · $t_0$ 설명 변수 · 분석 절차 · P4 밀도 선택 규칙, 분석 코드(생존 · Weibull AFT · 계단 변화점 + 모수 Bootstrap 우도비 · 군집 Bootstrap · TOST · Holm · LOCO C-index · $C_{eff}$ 측정), 결과 가림 장치, 합성 자료 테스트, `docs/deviation_log.md`
 - 2026-11-28 · Claude Code · P2 시작 (16:55, `launch_detached.ps1`, 60회). Seed 짝짓기 · 결과 가림 결정, COLLAB-LOG C-012
 - 2026-11-28 · Claude Code · P1 빈틈 보완 · P2 준비 (`fix/p1-gaps-p2-prep`): 지속 창 상한 · $S_{\max}$ 확인 연장(`early_stop.py` · `trainer.py`, summary `confirm_extended`), 판정 · 선택 규칙 코드(`src/analysis/selection.py` · `scripts/select_configs.py`, P1 선택 재현 · 출력 고정 4회 표시), 분리 실행 `scripts/launch_detached.ps1` (T-013 해결), 그림 `--unit`, P2 설계 · 대기열 60회
 - 2026-11-28 · Claude Code · Gate 2.5 안건 다섯 가지 결정 (`docs/p1-pilot.md` 9절): 선택 규칙 수정 → B-1 h11 · B-2 h12 · B-4 h04 로 바뀜, 지속 창 상한 20K (P2 부터), B-6 예산 동일, B-5 붕괴 진단(T-014). 열린 질문 12 해소 (초기화는 아키텍처별 선택)
