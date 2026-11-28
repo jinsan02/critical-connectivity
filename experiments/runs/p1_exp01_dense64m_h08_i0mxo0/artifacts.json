@@ -1,0 +1,43 @@
+{
+  "run_id": "p1_exp01_dense64m_h08_i0mxo0",
+  "status": "ok",
+  "note": "checkpoints/ 는 git 밖(본체 디스크)에 있다. sha256 으로 원본을 확인한다.",
+  "files": [
+    {
+      "path": "experiments/runs/p1_exp01_dense64m_h08_i0mxo0/config.json",
+      "bytes": 1269,
+      "mtime_ns": 1795761164463054000,
+      "sha256": "e865ae69a0aefd492ac1007e9d89eb9946d49c3b3d5ed058de8ea67bbc8fa1b5"
+    },
+    {
+      "path": "experiments/runs/p1_exp01_dense64m_h08_i0mxo0/summary.json",
+      "bytes": 1198,
+      "mtime_ns": 1795761164463054000,
+      "sha256": "5e42380cc1b33927cf885f3689486f988817ac3b49d3ac955d8f1ef6010ce67c"
+    },
+    {
+      "path": "experiments/runs/p1_exp01_dense64m_h08_i0mxo0/metrics.parquet",
+      "bytes": 35285,
+      "mtime_ns": 1795761164463054000,
+      "sha256": "19b8f497092ba03fbb2cd6aa0036ce9e26d207bb1d77d396ba4761e508da3429"
+    },
+    {
+      "path": "checkpoints/p1_exp01_dense64m_h08_i0mxo0/final.pt",
+      "bytes": 127918747,
+      "mtime_ns": 1795761164390414900,
+      "sha256": "b2e050939a7c5d511085378ef87bd120d65857d259fd2b634c1f6b3afb7093f3"
+    },
+    {
+      "path": "checkpoints/p1_exp01_dense64m_h08_i0mxo0/grok.pt",
+      "bytes": 127918479,
+      "mtime_ns": 1795760803012281900,
+      "sha256": "560a838822363fac61fecd5c8caeb0133220ef321e7a9c71dd330c985ae50795"
+    },
+    {
+      "path": "checkpoints/p1_exp01_dense64m_h08_i0mxo0/t0.pt",
+      "bytes": 127918007,
+      "mtime_ns": 1795759833946412100,
+      "sha256": "ce700f5f9fec0a0522021725575e2d2b883bd657ab098f09224f3aba1d81c278"
+    }
+  ]
+}

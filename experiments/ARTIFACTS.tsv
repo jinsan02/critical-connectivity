@@ -1,0 +1,101 @@
+run_id	status	config	summary	metrics	checkpoints	checkpoint_mb	fail_json	missing
+p0_r1_r1_base_i0mxo0	ok	1	1	1	final grok t0	1.3	0	
+p0_r1_r1_base_i1mxo0	ok	1	1	1	final grok t0	1.3	0	
+p0_r1_r1_base_i2mxo0	ok	1	1	1	final grok t0	1.3	0	
+p0_r1_r1_base_i3mxo0	ok	1	1	1	final grok t0	1.3	0	
+p0_r1_r1_base_i4mxo0	ok	1	1	1	final grok t0	1.3	0	
+p0_r1_r1_base_i5mxo0	ok	1	1	1	final grok t0	1.3	0	
+p0_r1_r1_base_i6mxo0	ok	1	1	1	final grok t0	1.3	0	
+p0_r1_r1_base_i7mxo0	ok	1	1	1	final grok t0	1.3	0	
+p0_r1_r1_base_i8mxo0	ok	1	1	1	final grok t0	1.3	0	
+p0_r1_r1_base_i9mxo0	ok	1	1	1	final grok t0	1.3	0	
+p0_r2_r1_neg_i0mxo0	ok	1	1	1	final t0	0.9	0	
+p0_r2_r1_neg_i1mxo0	ok	1	1	1	final t0	0.9	0	
+p0_r2_r1_neg_i2mxo0	ok	1	1	1	final t0	0.9	0	
+p0_r2_r1_pos_i0mxo0	ok	1	1	1	final grok t0	1.3	0	
+p0_r2_r1_pos_i1mxo0	ok	1	1	1	final grok t0	1.3	0	
+p0_r2_r1_pos_i2mxo0	ok	1	1	1	final grok t0	1.3	0	
+p1_exp01_cross_r1-h01_i0m0o0	ok	1	1	1	final grok t0	388.1	0	
+p1_exp01_cross_r1-h02_i0m0o0	ok	1	1	1	final t0	258.7	0	
+p1_exp01_cross_r1-h03_i0m0o0	ok	1	1	1	final grok t0	388.1	0	
+p1_exp01_cross_r1-h04_i0m0o0	ok	1	1	1	final grok t0	388.1	0	
+p1_exp01_cross_r1-h05_i0m0o0	ok	1	1	1	final grok t0	388.1	0	
+p1_exp01_cross_r1-h06_i0m0o0	ok	1	1	1	final grok t0	388.1	0	
+p1_exp01_cross_r1-h07_i0m0o0	ok	1	1	1	final t0	258.7	0	
+p1_exp01_cross_r1-h08_i0m0o0	ok	1	1	1	final t0	258.7	0	
+p1_exp01_cross_r1-h09_i0m0o0	ok	1	1	1	final grok t0	388.1	0	
+p1_exp01_cross_r1-h10_i0m0o0	ok	1	1	1	final grok t0	388.1	0	
+p1_exp01_cross_r1-h11_i0m0o0	ok	1	1	1	final grok t0	388.1	0	
+p1_exp01_cross_r1-h12_i0m0o0	ok	1	1	1	final grok t0	388.1	0	
+p1_exp01_crosshash_r1-h01_i0m0o0	ok	1	1	1	final t0	258.7	0	
+p1_exp01_crosshash_r1-h02_i0m0o0	ok	1	1	1	final t0	258.7	0	
+p1_exp01_crosshash_r1-h03_i0m0o0	ok	1	1	1	final t0	258.7	0	
+p1_exp01_crosshash_r1-h04_i0m0o0	ok	1	1	1	final t0	258.7	0	
+p1_exp01_crosshash_r1-h05_i0m0o0	ok	1	1	1	final t0	258.7	0	
+p1_exp01_crosshash_r1-h06_i0m0o0	ok	1	1	1	final t0	258.7	0	
+p1_exp01_crosshash_r1-h07_i0m0o0	ok	1	1	1	final t0	258.7	0	
+p1_exp01_crosshash_r1-h08_i0m0o0	ok	1	1	1	final t0	258.7	0	
+p1_exp01_crosshash_r1-h09_i0m0o0	ok	1	1	1	final t0	258.7	0	
+p1_exp01_crosshash_r1-h10_i0m0o0	ok	1	1	1	final t0	258.7	0	
+p1_exp01_crosshash_r1-h11_i0m0o0	ok	1	1	1	final t0	258.7	0	
+p1_exp01_crosshash_r1-h12_i0m0o0	ok	1	1	1	final grok t0	388.0	0	
+p1_exp01_dense64m8l_h01_i0mxo0	ok	1	1	1	final grok t0	367.3	0	
+p1_exp01_dense64m8l_h02_i0mxo0	ok	1	1	1	final grok t0	367.3	0	
+p1_exp01_dense64m8l_h03_i0mxo0	ok	1	1	1	final grok t0	367.3	0	
+p1_exp01_dense64m8l_h04_i0mxo0	ok	1	1	1	final grok t0	367.3	0	
+p1_exp01_dense64m8l_h05_i0mxo0	ok	1	1	1	final grok t0	367.3	0	
+p1_exp01_dense64m8l_h06_i0mxo0	ok	1	1	1	final grok t0	367.3	0	
+p1_exp01_dense64m8l_h07_i0mxo0	ok	1	1	1	final t0	244.8	0	
+p1_exp01_dense64m8l_h08_i0mxo0	ok	1	1	1	final grok t0	367.3	0	
+p1_exp01_dense64m8l_h09_i0mxo0	ok	1	1	1	final grok t0	367.3	0	
+p1_exp01_dense64m8l_h10_i0mxo0	ok	1	1	1	final grok t0	367.3	0	
+p1_exp01_dense64m8l_h11_i0mxo0	ok	1	1	1	final grok t0	367.3	0	
+p1_exp01_dense64m8l_h12_i0mxo0	ok	1	1	1	final grok t0	367.3	0	
+p1_exp01_dense64m_h01_i0mxo0	ok	1	1	1	final grok t0	366.0	0	
+p1_exp01_dense64m_h02_i0mxo0	ok	1	1	1	final grok t0	366.0	0	
+p1_exp01_dense64m_h03_i0mxo0	ok	1	1	1	final grok t0	366.0	0	
+p1_exp01_dense64m_h04_i0mxo0	ok	1	1	1	final grok t0	366.0	0	
+p1_exp01_dense64m_h05_i0mxo0	ok	1	1	1	final grok t0	366.0	0	
+p1_exp01_dense64m_h06_i0mxo0	ok	1	1	1	final t0	244.0	0	
+p1_exp01_dense64m_h07_i0mxo0	ok	1	1	1	final t0	244.0	0	
+p1_exp01_dense64m_h08_i0mxo0	ok	1	1	1	final grok t0	366.0	0	
+p1_exp01_dense64m_h09_i0mxo0	ok	1	1	1	final t0	244.0	0	
+p1_exp01_dense64m_h10_i0mxo0	ok	1	1	1	final grok t0	366.0	0	
+p1_exp01_dense64m_h11_i0mxo0	ok	1	1	1	final t0	244.0	0	
+p1_exp01_dense64m_h12_i0mxo0	ok	1	1	1	final grok t0	366.0	0	
+p1_exp01_dense8m_h01_i0mxo0	ok	1	1	1	final t0	30.8	0	
+p1_exp01_dense8m_h02_i0mxo0	ok	1	1	1	final grok t0	46.1	0	
+p1_exp01_dense8m_h03_i0mxo0	ok	1	1	1	final grok t0	46.1	0	
+p1_exp01_dense8m_h04_i0mxo0	ok	1	1	1	final grok t0	46.1	0	
+p1_exp01_dense8m_h05_i0mxo0	ok	1	1	1	final grok t0	46.1	0	
+p1_exp01_dense8m_h06_i0mxo0	ok	1	1	1	final grok t0	46.1	0	
+p1_exp01_dense8m_h07_i0mxo0	ok	1	1	1	final grok t0	46.1	0	
+p1_exp01_dense8m_h08_i0mxo0	ok	1	1	1	final grok t0	46.1	0	
+p1_exp01_dense8m_h09_i0mxo0	ok	1	1	1	final grok t0	46.1	0	
+p1_exp01_dense8m_h10_i0mxo0	ok	1	1	1	final grok t0	46.1	0	
+p1_exp01_dense8m_h11_i0mxo0	ok	1	1	1	final grok t0	46.1	0	
+p1_exp01_dense8m_h12_i0mxo0	ok	1	1	1	final grok t0	46.1	0	
+p1_exp01_ens8x8m_h01_i0mxo0	ok	1	1	1	final grok t0	366.7	0	
+p1_exp01_ens8x8m_h02_i0mxo0	ok	1	1	1	final grok t0	366.7	0	
+p1_exp01_ens8x8m_h03_i0mxo0	ok	1	1	1	final grok t0	366.7	0	
+p1_exp01_ens8x8m_h04_i0mxo0	ok	1	1	1	final grok t0	366.7	0	
+p1_exp01_ens8x8m_h05_i0mxo0	ok	1	1	1	final grok t0	366.7	0	
+p1_exp01_ens8x8m_h06_i0mxo0	ok	1	1	1	final grok t0	366.7	0	
+p1_exp01_ens8x8m_h07_i0mxo0	ok	1	1	1	final t0	244.5	0	
+p1_exp01_ens8x8m_h08_i0mxo0	ok	1	1	1	final grok t0	366.7	0	
+p1_exp01_ens8x8m_h09_i0mxo0	ok	1	1	1	final grok t0	366.7	0	
+p1_exp01_ens8x8m_h10_i0mxo0	ok	1	1	1	final grok t0	366.7	0	
+p1_exp01_ens8x8m_h11_i0mxo0	ok	1	1	1	final grok t0	366.7	0	
+p1_exp01_ens8x8m_h12_i0mxo0	ok	1	1	1	final grok t0	366.7	0	
+p1_exp01_pmix_r1-h01_i0m0o0	ok	1	1	1	final grok t0	388.0	0	
+p1_exp01_pmix_r1-h02_i0m0o0	ok	1	1	1	final t0	258.7	0	
+p1_exp01_pmix_r1-h03_i0m0o0	ok	1	1	1	final t0	258.7	0	
+p1_exp01_pmix_r1-h04_i0m0o0	ok	1	1	1	final grok t0	388.0	0	
+p1_exp01_pmix_r1-h05_i0m0o0	ok	1	1	1	final grok t0	388.0	0	
+p1_exp01_pmix_r1-h06_i0m0o0	ok	1	1	1	final grok t0	388.0	0	
+p1_exp01_pmix_r1-h07_i0m0o0	ok	1	1	1	final t0	258.7	0	
+p1_exp01_pmix_r1-h08_i0m0o0	ok	1	1	1	final t0	258.7	0	
+p1_exp01_pmix_r1-h09_i0m0o0	ok	1	1	1	final t0	258.7	0	
+p1_exp01_pmix_r1-h10_i0m0o0	ok	1	1	1	final grok t0	388.0	0	
+p1_exp01_pmix_r1-h11_i0m0o0	ok	1	1	1	final grok t0	388.0	0	
+p1_exp01_pmix_r1-h12_i0m0o0	ok	1	1	1	final grok t0	388.0	0	
