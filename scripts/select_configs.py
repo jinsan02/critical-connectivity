@@ -1,6 +1,7 @@
 """run 묶음마다 판정하고 설정 하나를 고른다 (`src/analysis/selection.py`, `docs/p1-pilot.md` 9.1).
 
-    python scripts/select_configs.py --group "B-1=p1_exp01_dense8m_*" \n        --group "Cross=p1_exp01_cross_*"
+    python scripts/select_configs.py --group "B-1=p1_exp01_dense8m_*"
+    python scripts/select_configs.py --group "Cross=p1_exp01_cross_*" --min-gap 1000
 
 입력은 ``experiments/runs/<run_id>/`` 의 ``summary.json`` · ``config.json`` ·
 ``metrics.parquet`` (``scripts/collect_outputs.py`` 가 모은 것). 묶음마다 마크다운 표를 출력한다.
