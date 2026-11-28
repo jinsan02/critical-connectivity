@@ -30,7 +30,8 @@
 3b. ~~학습 루프 + 작업 대기열 + 조기 종료~~ → `feat/train-loop` (Seed 묶음 학습은 아직 — R1 · Dense-8M 용, 필요하면 추가)
 4. ~~원장 열 · run_id 규칙 확정~~ → `feat/ledger-record` (LEDGER_SCHEMA v1, 학습 스크립트가 원장 행을 씀). ~~Gate 2 — R1 10 Seeds (P0) · R2 음성 대조~~ → `exp/p0-gate2` 통과 (R1 10/10, T-011 git_dirty 수정)
 5. (보조) EXP-11 학습 나이테 MVP — Pythia-160M 공개 체크포인트 8개 (기획서 v0.6 §28.6). 다운로드 승인 전에는 시작하지 않는다 (열린 질문 10)
-6. 파일럿 P1 — 설계 `docs/p1-pilot.md` (7종 × 12회 = 84). ~~84회 완료~~ (2026-11-28). 선택 확정 (`docs/p1-pilot.md` 9절): B-1 h11 · B-2 h12 · B-3 h11 · B-4 h04 · B-5 h11 · B-6 h12 · Cross-Model h05, 모두 wd 1.0 → **Gate 2.5 사전등록** 남은 것: 지속 창 수정(`early_stop.py`, 9.4절) 구현, 사전등록 문서 · `prereg-v1`
+6. 파일럿 P1 — 설계 `docs/p1-pilot.md` (7종 × 12회 = 84). ~~84회 완료~~ (2026-11-28). 선택 확정 (`docs/p1-pilot.md` 9절): B-1 h11 · B-2 h12 · B-3 h11 · B-4 h04 · B-5 h11 · B-6 h12 · Cross-Model h05, 모두 wd 1.0. ~~지속 창 수정~~ (`early_stop.py` `max_window` · `confirm_extension`)
+7. **P2 1차 밀도 탐색** — 설계 `docs/p2-design.md`, 대기열 `configs/queue/p2.yaml` (60회, 상한 약 44시간), 띄우기 `scripts/launch_detached.ps1`. 띄우기 전 사람 결정: Seed 짝짓기, 사전등록(`docs/preregistration.md` · 분석 코드 · `prereg-v1`)과의 순서 (설계 6절)
 
 ## 사람에게 요청한 것
 
@@ -107,6 +108,7 @@
 
 ## 최근 변경
 
+- 2026-11-28 · Claude Code · P1 빈틈 보완 · P2 준비 (`fix/p1-gaps-p2-prep`): 지속 창 상한 · $S_{\max}$ 확인 연장(`early_stop.py` · `trainer.py`, summary `confirm_extended`), 판정 · 선택 규칙 코드(`src/analysis/selection.py` · `scripts/select_configs.py`, P1 선택 재현 · 출력 고정 4회 표시), 분리 실행 `scripts/launch_detached.ps1` (T-013 해결), 그림 `--unit`, P2 설계 · 대기열 60회
 - 2026-11-28 · Claude Code · Gate 2.5 안건 다섯 가지 결정 (`docs/p1-pilot.md` 9절): 선택 규칙 수정 → B-1 h11 · B-2 h12 · B-4 h04 로 바뀜, 지속 창 상한 20K (P2 부터), B-6 예산 동일, B-5 붕괴 진단(T-014). 열린 질문 12 해소 (초기화는 아키텍처별 선택)
 - 2026-11-28 · Claude Code · **P1 완료** (`exp/p1-b1`): 2단계 6종 72회 기록 · 그림 6묶음 · 선택, 산출물 모으기(run 100개, `experiments/ARTIFACTS.tsv`), 관찰과 Gate 2.5 안건 (`docs/p1-pilot.md` 8절)
 - 2026-11-27 · Claude Code · 학습 중간 가중치 정책 (`feat/snapshots`): `SnapshotConfig`, `snap_<스텝>.pt` + `snapshots.json`, 재개 시 이어 감, 모으기가 `snapshots.json` 을 run 폴더로 복사

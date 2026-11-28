@@ -43,13 +43,16 @@ def main(argv: list[str] | None = None) -> int:
         help="'라벨=run_id glob' (여러 번)",
     )
     ap.add_argument("--root", type=Path, default=ROOT, help="저장소 위치 (기본: 이 저장소)")
+    ap.add_argument(
+        "--unit", default="Seed", help="묶음 안 가는 선의 단위 (기본 Seed, P1 은 'lr 시도')"
+    )
     args = ap.parse_args(argv)
 
     groups = load_groups(args.group, args.root)
     for g in groups:
         done = sum(r.finished for r in g.runs)
         print(f"{g.label}: run {len(g.runs)}개 (끝남 {done})")
-    for path in plot_all(groups, args.root / "results" / "figures" / args.name):
+    for path in plot_all(groups, args.root / "results" / "figures" / args.name, args.unit):
         print(path.relative_to(args.root))
     return 0
 

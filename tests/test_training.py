@@ -60,6 +60,27 @@ def test_relative_window_for_late_grok():
     assert t.t_grok == 60000 and t.stop_step() == 60000 + 30000
 
 
+def test_window_cap():
+    t = GrokTracker(EarlyStopConfig(max_window=20000))
+    assert t.window(60000) == 20000 and t.window(30000) == 15000 and t.window(4000) == 5000
+
+
+def test_confirming_closes_new_candidates():
+    t = GrokTracker(EarlyStopConfig(max_window=20000, confirm_extension=20000))
+    assert not t.confirming(99900, 100000)
+    assert not t.confirming(100000, 100000)  # 후보 없음 → 연장 안 함
+    t.update(100100, 1.0, 0.99)
+    assert t.candidate is None  # S_max 뒤에는 새 후보를 받지 않는다
+    u = GrokTracker(EarlyStopConfig(max_window=20000, confirm_extension=20000))
+    u.update(95000, 1.0, 0.97)  # 창 20,000 → 115,000 에 확정
+    assert u.confirming(100000, 100000) and u.confirming(110000, 100000)
+    u.update(115000, 1.0, 0.97)
+    assert u.t_grok == 95000 and not u.confirming(115000, 100000)
+    v = GrokTracker(EarlyStopConfig(max_window=20000, confirm_extension=10000))
+    v.update(95000, 1.0, 0.97)
+    assert v.confirming(105000, 100000) and not v.confirming(110000, 100000)  # 한도
+
+
 def test_candidate_dropped_below_hold():
     t = GrokTracker()
     seq = [(1.0, 0.96)] * 5 + [(1.0, 0.85)] + [(1.0, 0.92)] * 3 + [(1.0, 0.96)] * 60
@@ -158,6 +179,30 @@ def test_early_stop_ends_run(tmp_path):
         device="cpu",
     )
     assert s["stop_reason"] == "early_stop" and s["t_grok"] == 0 and s["steps_done"] == 40
+
+
+def test_confirm_extension_past_s_max(tmp_path):
+    # 후보 0 · 창 150 > S_max 100: 연장이 없으면 중도절단, 있으면 150 에서 확정하고 멈춘다
+    es = {"min_window": 150, "post_grok_steps": 40, "grok_acc": 0.0, "hold_acc": 0.0}
+    a = train_run(
+        small_dense(),
+        TINY_DATA,
+        tiny_train(s_max=100, early_stop=es),
+        RunPaths.under(tmp_path / "a", "x"),
+        "x",
+        device="cpu",
+    )
+    assert a["censored"] == 1 and a["steps_done"] == 100 and a["confirm_extended"] == 0
+    b = train_run(
+        small_dense(),
+        TINY_DATA,
+        tiny_train(s_max=100, early_stop={**es, "confirm_extension": 100}),
+        RunPaths.under(tmp_path / "b", "x"),
+        "x",
+        device="cpu",
+    )
+    assert b["t_grok"] == 0 and b["censored"] == 0 and b["stop_reason"] == "s_max"
+    assert b["steps_done"] == 160 and b["confirm_extended"] == 60
 
 
 def test_cross_model_logs_router(tmp_path):
