@@ -4,8 +4,8 @@
 
 ## 지금
 
-- 마지막 갱신: 2026-11-27
-- 단계: **Gate 2 통과** — R1 10 Seeds 모두 Grokking, R2 음성 대조 우연 수준 · 양성 대조 빠른 일반화. Gate 1 남은 것: 공식 처리량 측정(측정 전 정리 승인). 다음은 파일럿 P1 → Gate 2.5
+- 마지막 갱신: 2026-11-28
+- 단계: **Gate 2 통과** — R1 10 Seeds 모두 Grokking, R2 음성 대조 우연 수준 · 양성 대조 빠른 일반화. **파일럿 P1 완료** (7종 × 12회 = 84, 7종 모두 지연 Grokking 후보 있음). Gate 1 남은 것: 공식 처리량 측정(측정 전 정리 승인). 다음은 Gate 2.5
 - 대상 환경: 본체 desktop-5070 (RTX 5070 Ti 16GB, `C:\critical-connectivity`, conda `critconn`) — 실측 `env/hw-20261125.md`
 - 주 실행자: 사람 + Claude Code · Codex
 
@@ -30,7 +30,7 @@
 3b. ~~학습 루프 + 작업 대기열 + 조기 종료~~ → `feat/train-loop` (Seed 묶음 학습은 아직 — R1 · Dense-8M 용, 필요하면 추가)
 4. ~~원장 열 · run_id 규칙 확정~~ → `feat/ledger-record` (LEDGER_SCHEMA v1, 학습 스크립트가 원장 행을 씀). ~~Gate 2 — R1 10 Seeds (P0) · R2 음성 대조~~ → `exp/p0-gate2` 통과 (R1 10/10, T-011 git_dirty 수정)
 5. (보조) EXP-11 학습 나이테 MVP — Pythia-160M 공개 체크포인트 8개 (기획서 v0.6 §28.6). 다운로드 승인 전에는 시작하지 않는다 (열린 질문 10)
-6. 파일럿 P1 — 설계 `docs/p1-pilot.md` (7종 × 12회 = 84). 1단계 B-1 완료 (선택 h05: init 0.02 · wd 1.0 · lr 3e-4, 후보 7/12) → **2단계 72회 진행 중** (16~40시간 추정) → Gate 2.5 사전등록. 묶음마다 `scripts/plot_runs.py` 로 그림
+6. 파일럿 P1 — 설계 `docs/p1-pilot.md` (7종 × 12회 = 84). ~~84회 완료~~ (2026-11-28, 선택 B-1 h05 · B-2 h04 · B-3 h11 · B-4 h06 · B-5 h11 · B-6 h12 · Cross-Model h05, 모두 wd 1.0 — `docs/p1-pilot.md` 8절) → **Gate 2.5 사전등록**: 8.4절 다섯 가지(B-2 반-Grokking 선택, 경계 선택 2개, B-6 예산, 중도절단 · 지속 창, B-5 wd 0.1 붕괴)를 사람과 정한다
 
 ## 사람에게 요청한 것
 
@@ -81,6 +81,7 @@
 | 2026-11-27 | P1 선택 규칙: Validation 으로 $T_{\mathrm{grok}} - T_{\mathrm{mem}} \ge$ 1,000 인 지연 Grokking 중 $T_{\mathrm{grok}}$ 최단. 없으면 최종 Val 최고 + '지연 Grokking 없음' 표시 | 사람 결정 (권장안) — §9 EXP-01: 전이가 없으면 임계점 비교가 어렵다 |
 | 2026-11-27 | P1 은 B-1 12회(약 1시간)를 먼저 돌려 격자에서 지연 Grokking 이 나오는지 보고 나머지 72회를 시작한다 | 사람 결정 (권장안) |
 | 2026-11-27 | P1 1단계 B-1: 지연 Grokking 후보 7/12 → 2단계 시작. 선택 h05 (init 0.02 · wd 1.0 · lr 3e-4, $T_{\mathrm{grok}}$ 1,500) | 설계 5절 확인 조건 · 3절 선택 규칙 (`docs/p1-pilot.md` 7절) |
+| 2026-11-28 | P1 2단계 72회 선택: B-2 h04 (0.02 · 1.0 · 1e-4) · B-3 h11 (1/√d · 1.0 · 3e-4) · B-4 h06 (0.02 · 1.0 · 1e-3) · B-5 h11 (1/√d · 1.0 · 3e-4) · B-6 h12 (1/√d · 1.0 · 1e-3) · Cross-Model h05 (0.02 · 1.0 · 3e-4). 선택은 Gate 2.5 사전등록에서 동결 | 설계 3절 선택 규칙 (`docs/p1-pilot.md` 8절), 원장 72 run (커밋 8c167b1) |
 | 2026-11-27 | 실험 산출물은 모두 모은다: 지표 Parquet 은 run 폴더로 복사해 record 커밋에 넣고(run 하나에 수십 KB), 가중치는 본체 디스크에 두고 목록 · sha256 만 커밋, 대기열 로그도 커밋 | 사람 요청 (나중 전체 분석) — .gitignore 의 '지표 Parquet 은 git 밖' 방침을 run 폴더 사본으로 보완 |
 | 2026-11-27 | 학습 중간 가중치(스냅샷) 8개를 더 남긴다: 스텝 1K · 2K · 5K · 10K · 20K · 50K, 평가 정확도가 처음 50% 를 넘는 스텝(Grokking 직전), Grokking 후보 + 5K. `configs/train/*.yaml` 의 `snapshots`. 지금 도는 P1 2단계에는 적용되지 않고 다음 대기열부터 | 사람 결정 (권장안) — 기획서 §22.1 '궤적 스냅샷 정책은 Gate 2.5 전에', EXP-11 · 층별 변화 분석용. 64M급 run 하나 약 1GB 추가, P2~P7 약 420GB (디스크 여유 1.47TB) |
 | 2026-11-27 | run_id = `<phase>_<exp>_<arch>_<변형>_i<init>m<mask>o<order>`, 학습 스크립트가 만든다 (arch 짧은 이름, 변형 `r<ρ>`/`base`, mask 없으면 `x`) | 사람 결정 (권장안, 열린 질문 3) — STRUCTURE 5절 |
@@ -102,6 +103,7 @@
 
 ## 최근 변경
 
+- 2026-11-28 · Claude Code · **P1 완료** (`exp/p1-b1`): 2단계 6종 72회 기록 · 그림 6묶음 · 선택, 산출물 모으기(run 100개, `experiments/ARTIFACTS.tsv`), 관찰과 Gate 2.5 안건 (`docs/p1-pilot.md` 8절)
 - 2026-11-27 · Claude Code · 학습 중간 가중치 정책 (`feat/snapshots`): `SnapshotConfig`, `snap_<스텝>.pt` + `snapshots.json`, 재개 시 이어 감, 모으기가 `snapshots.json` 을 run 폴더로 복사
 - 2026-11-27 · Claude Code · 산출물 모으기 (`feat/collect-outputs`): `scripts/collect_outputs.py` — run 마다 지표 Parquet 을 `experiments/runs/` 로 복사(커밋 · GitHub 백업), 가중치 목록 · sha256 `artifacts.json`, 전체 목록 `experiments/ARTIFACTS.tsv`. `run_queue.py` 가 화면 출력을 `experiments/logs/` 에 남기고 끝날 때 모으기를 자동 실행
 - 2026-11-27 · Claude Code · P1 1단계 B-1 12회 기록 · 그림, 선택 h05. 2단계 72회 시작
