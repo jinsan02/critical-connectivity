@@ -8,11 +8,13 @@
 
     <트레일러 — 기계가 읽는 계보>
 
-핵심 두 가지
+핵심 세 가지
     1. record 커밋은 코드·설정을 건드릴 수 없다.
        결과를 보고 코드를 슬쩍 고치면서 기록하는 경로를 없앤다.
     2. fix 커밋은 Invalidates 를 반드시 적는다.
        그 버그가 어떤 기존 run 을 무효화하는지 남긴다.
+    3. 사전등록 태그 prereg-v1 뒤 동결 파일(docs/preregistration.md 7절)을 바꾸는 커밋은
+       Deviation 을 반드시 적고 docs/deviation_log.md 에 남긴다 (열린 질문 5, 사람 결정).
 """
 
 from __future__ import annotations
@@ -55,6 +57,21 @@ REQUIRED_TRAILERS: dict = {
 }
 
 SUBJECT_MAX = 72
+
+# 사전등록(prereg-v1) 뒤 바꾸면 Deviation 트레일러가 필요한 파일 (docs/preregistration.md 7절).
+PREREG_TAG = "prereg-v1"
+FROZEN_PATHS = (
+    "src/training/early_stop.py",
+    "src/training/trainer.py",
+    "configs/train/base.yaml",
+    "src/analysis/selection.py",
+    "src/analysis/connectivity.py",
+    "src/analysis/stats.py",
+    "src/analysis/density.py",
+    "src/analysis/prediction.py",
+    "scripts/measure_ceff.py",
+    "scripts/analyze_density.py",
+)
 
 # record 커밋에서 스테이지가 허용되는 경로.
 RECORD_ALLOWED_PREFIXES = ("experiments/", "reports/", "docs/")
@@ -122,8 +139,15 @@ def _path_exists(rel: str, root: Path, source: str) -> bool:
     return (root / rel).exists()
 
 
-def check(message: str, root=None, *, source: str = "worktree", staged=None) -> list:
-    """규칙 위반 목록을 돌려준다. 빈 리스트면 통과."""
+def prereg_tagged(root: Path) -> bool:
+    try:
+        return repo.git("tag", "-l", PREREG_TAG, root=root).strip() == PREREG_TAG
+    except Exception:  # noqa: BLE001 — git 이 없는 환경에서는 검사하지 않는다
+        return False
+
+
+def check(message: str, root=None, *, source: str = "worktree", staged=None, prereg=None) -> list:
+    """규칙 위반 목록을 돌려준다. 빈 리스트면 통과. ``prereg`` 는 시험용 (None 이면 태그 확인)."""
     root = Path(root or repo.repo_root())
     errors: list = []
 
@@ -192,8 +216,18 @@ def check(message: str, root=None, *, source: str = "worktree", staged=None) -> 
         if not _path_exists(rel, root, source):
             errors.append(f"Ledger 에 적힌 경로가 없다: {rel}")
 
+    files = repo.staged_files(root) if staged is None else staged
+    frozen = [f for f in files if f in FROZEN_PATHS]
+    if frozen and "Deviation" not in trailers:
+        tagged = prereg_tagged(root) if prereg is None else prereg
+        if tagged:
+            errors.append(
+                f"{PREREG_TAG} 뒤 동결 파일을 바꾸는 커밋에는 'Deviation:' 트레일러가 필요하다 "
+                "(docs/deviation_log.md 에 같은 번호로 적는다):"
+            )
+            errors.extend(f"    {f}" for f in frozen)
+
     if ctype == "record":
-        files = repo.staged_files(root) if staged is None else staged
         bad = [f for f in files if not f.startswith(RECORD_ALLOWED_PREFIXES)]
         if bad:
             errors.append(

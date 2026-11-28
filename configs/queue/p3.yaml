@@ -1,0 +1,70 @@
+# P3 Router 대조 (기획서 §15.1, EXP-04 · H6 탐색): ρ 10개 × 3 Seeds × {해시 Router, 고정 무작위 Router} = 60회
+# 해시 = B-6 P1 선택 h12 (init 1/√d 0.0589 · wd 1.0 · lr 1e-3). 고정 무작위 = Cross-Model h05 설정 (init 0.02 · wd 1.0 · lr 3e-4),
+# Router 만 바꾼 비교 (사전등록 8절-1, 사람 결정 2026-11-28). Seed s = init_seed = mask_seed (P2 와 같은 마스크 줄).
+# P2 가 끝난 뒤 · prereg-v1 태그 뒤에 띄운다. 설계: docs/preregistration.md 2절
+defaults:
+  phase: p3
+  exp: exp04
+  data: configs/data/add97.yaml
+  train: configs/train/base.yaml
+jobs:
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.0, model.mask_seed: 0, train.init_seed: 0, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.01, model.mask_seed: 0, train.init_seed: 0, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.02, model.mask_seed: 0, train.init_seed: 0, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.03, model.mask_seed: 0, train.init_seed: 0, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.04, model.mask_seed: 0, train.init_seed: 0, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.06, model.mask_seed: 0, train.init_seed: 0, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.1, model.mask_seed: 0, train.init_seed: 0, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.25, model.mask_seed: 0, train.init_seed: 0, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.5, model.mask_seed: 0, train.init_seed: 0, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 1.0, model.mask_seed: 0, train.init_seed: 0, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.0, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.01, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.02, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.03, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.04, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.06, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.1, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.25, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.5, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 1.0, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.0, model.mask_seed: 1, train.init_seed: 1, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.01, model.mask_seed: 1, train.init_seed: 1, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.02, model.mask_seed: 1, train.init_seed: 1, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.03, model.mask_seed: 1, train.init_seed: 1, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.04, model.mask_seed: 1, train.init_seed: 1, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.06, model.mask_seed: 1, train.init_seed: 1, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.1, model.mask_seed: 1, train.init_seed: 1, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.25, model.mask_seed: 1, train.init_seed: 1, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.5, model.mask_seed: 1, train.init_seed: 1, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 1.0, model.mask_seed: 1, train.init_seed: 1, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.0, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.01, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.02, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.03, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.04, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.06, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.1, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.25, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.5, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 1.0, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.0, model.mask_seed: 2, train.init_seed: 2, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.01, model.mask_seed: 2, train.init_seed: 2, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.02, model.mask_seed: 2, train.init_seed: 2, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.03, model.mask_seed: 2, train.init_seed: 2, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.04, model.mask_seed: 2, train.init_seed: 2, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.06, model.mask_seed: 2, train.init_seed: 2, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.1, model.mask_seed: 2, train.init_seed: 2, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.25, model.mask_seed: 2, train.init_seed: 2, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 0.5, model.mask_seed: 2, train.init_seed: 2, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_hash.yaml, set: {model.density: 1.0, model.mask_seed: 2, train.init_seed: 2, train.lr: 1.0e-3, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.0, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.01, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.02, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.03, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.04, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.06, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.1, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.25, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 0.5, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model_random.yaml, set: {model.density: 1.0, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
