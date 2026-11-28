@@ -1,0 +1,71 @@
+# P2 1차 밀도 탐색 (기획서 §9 EXP-02, §15.1): ρ 10개 × 3 Seeds × {Cross-Model, B-5 Parallel-Mixing} = 60회
+# 학습 설정은 P1 확정 선택 (docs/p1-pilot.md 9.2): Cross-Model h05 (init 0.02 · wd 1.0 · lr 3e-4),
+# B-5 h11 (init 1/√d = 0.0589 · wd 1.0 · lr 3e-4). D01 · 배치 256 · S_max 100K, 지속 창 상한 20K + 확인 연장.
+# Seed s = init_seed = mask_seed (s = 0, 1, 2). 같은 mask_seed 안에서 ρ 마스크는 중첩된다 (§12A-5).
+# 순서: Seed 0 의 20회(두 아키텍처 × ρ 10개)를 먼저 — 하루 안에 ρ 축 전체를 한 번 본다. 설계: docs/p2-design.md
+defaults:
+  phase: p2
+  exp: exp02
+  data: configs/data/add97.yaml
+  train: configs/train/base.yaml
+jobs:
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.0, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.01, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.02, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.03, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.04, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.06, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.1, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.25, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.5, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 1.0, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.0, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.01, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.02, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.03, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.04, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.06, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.1, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.25, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.5, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 1.0, model.mask_seed: 0, train.init_seed: 0, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.0, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.01, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.02, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.03, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.04, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.06, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.1, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.25, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.5, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 1.0, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.0, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.01, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.02, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.03, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.04, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.06, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.1, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.25, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.5, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 1.0, model.mask_seed: 1, train.init_seed: 1, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.0, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.01, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.02, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.03, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.04, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.06, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.1, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.25, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 0.5, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/cross_model.yaml, set: {model.density: 1.0, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.02}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.0, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.01, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.02, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.03, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.04, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.06, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.1, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.25, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 0.5, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}
+  - {model: configs/model/parallel_mixing.yaml, set: {model.density: 1.0, model.mask_seed: 2, train.init_seed: 2, train.lr: 3.0e-4, train.weight_decay: 1.0, model.init_std: 0.0589}}

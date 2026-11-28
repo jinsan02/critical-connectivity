@@ -382,16 +382,19 @@ class Trainer:
         t_start = time.perf_counter()
         step_at_start = self.step
         stop_reason = "s_max"
+        s_max = self.cfg.s_max
 
         def wall() -> float:
             return self.wall_before + time.perf_counter() - t_start
 
         if self.step == 0:
             self._handle_events(self.evaluate_and_log(0.0))
-        while self.step < self.cfg.s_max:
+        while self.step < s_max or self.tracker.confirming(self.step, s_max):
             self.train_step()
             if self.step % self.cfg.eval_every == 0:
                 self._handle_events(self.evaluate_and_log(wall()))
+                if self.step > s_max and self.tracker.t_grok is not None:
+                    break  # 확인 연장 중 확정 — 사후 관측은 하지 않는다 (stop_reason s_max)
                 if self.tracker.should_stop(self.step):
                     stop_reason = "early_stop"
                     break
@@ -455,6 +458,7 @@ class Trainer:
         return {
             **self.base_fields(),
             "steps_done": self.step,
+            "confirm_extended": max(0, self.step - self.cfg.s_max),
             "t_mem": tr.t_mem,
             "t0": tr.t0,
             "t_grok": tr.t_grok,

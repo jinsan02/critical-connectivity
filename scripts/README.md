@@ -15,7 +15,9 @@
 | `run_queue.py` | 대기열 파일의 실행을 한 줄로 차례대로 (끝난 것은 건너뛰고 중단된 것은 재개). 화면 출력은 `experiments/logs/<대기열>-<시각>.log` 에도 남는다 |
 
 | `collect_outputs.py` | 끝난 run 의 산출물을 모은다: 지표 Parquet 을 `experiments/runs/<run_id>/metrics.parquet` 로 복사, 가중치 목록 · sha256 을 `artifacts.json` 에, 전체 목록 `experiments/ARTIFACTS.tsv` (`run_queue.py` 가 끝날 때 자동 실행) |
-| `plot_runs.py` | run 묶음 학습 곡선 그림 → `results/figures/<name>/` (정확도 · $T_{grok}$ · 가중치 노름, 진행 중 run 포함) |
+| `plot_runs.py` | run 묶음 학습 곡선 그림 → `results/figures/<name>/` (정확도 · $T_{grok}$ · 가중치 노름, 진행 중 run 포함). `--unit` 은 가는 선의 단위 (기본 Seed, P1 은 "lr 시도") |
+| `select_configs.py` | run 묶음마다 판정(후보 · 점진형 · 반-Grokking · 지연 없음 · 불안정 · 일반화 안 됨 · 출력 고정)하고 설정 하나를 고른다 (`docs/p1-pilot.md` 9.1) |
+| `launch_detached.ps1` | 본체에서 대기열을 SSH 와 분리해 띄운다 (WMI, 로그 `experiments/logs/launch-*.log`, T-013) |
 
 측정 기록은 `docs/throughput-YYYYMMDD.md`. 그림 예:
 

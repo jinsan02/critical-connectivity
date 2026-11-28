@@ -168,7 +168,7 @@ def _title(g: Group) -> str:
     return f"{g.label}  ·  {len(g.runs)} run"
 
 
-def plot_curves(groups: list[Group], out: Path) -> Path:
+def plot_curves(groups: list[Group], out: Path, unit: str = "Seed") -> Path:
     fig, axes = _panels(len(groups))
     for ax, g in zip(axes, groups, strict=True):
         for r in g.runs:
@@ -205,11 +205,13 @@ def plot_curves(groups: list[Group], out: Path) -> Path:
         plt.Line2D([], [], color=EVAL, lw=0, marker="o", ms=5, mec=SURFACE, label="$T_{grok}$"),
     ]
     fig.legend(handles=handles, loc="upper right", ncol=3, bbox_to_anchor=(1, 1.0))
-    fig.text(0.01, 0.985, "가는 선: Seed 별 · 굵은 선: 중앙값", fontsize=8, color=INK_2, va="top")
+    fig.text(
+        0.01, 0.985, f"가는 선: {unit} 별 · 굵은 선: 중앙값", fontsize=8, color=INK_2, va="top"
+    )
     return _save(fig, out / "curves.png")
 
 
-def plot_tgrok(groups: list[Group], out: Path) -> Path:
+def plot_tgrok(groups: list[Group], out: Path, unit: str = "Seed") -> Path:
     fig, ax = plt.subplots(figsize=(7.2, 0.7 * len(groups) + 1.2))
     s_max = max((r.s_max or 0) for g in groups for r in g.runs) or None
     labels = []
@@ -229,7 +231,9 @@ def plot_tgrok(groups: list[Group], out: Path) -> Path:
     ax.set_ylim(-0.6, len(groups) - 0.4)
     ax.grid(axis="y", visible=False)
     _log_steps(ax)
-    ax.set_title("$T_{grok}$ (Seed 별, 세로 막대: 중앙값, 빈 점: $S_{max}$ 까지 없음)", loc="left")
+    ax.set_title(
+        f"$T_{{grok}}$ ({unit} 별, 세로 막대: 중앙값, 빈 점: $S_{{max}}$ 까지 없음)", loc="left"
+    )
     return _save(fig, out / "tgrok.png")
 
 
@@ -255,5 +259,10 @@ def _save(fig, path: Path) -> Path:
     return path
 
 
-def plot_all(groups: list[Group], out: Path) -> list[Path]:
-    return [plot_curves(groups, out), plot_tgrok(groups, out), plot_weight_norm(groups, out)]
+def plot_all(groups: list[Group], out: Path, unit: str = "Seed") -> list[Path]:
+    """``unit``: 묶음 안의 가는 선이 무엇인지 (예: P1 은 "lr 시도")."""
+    return [
+        plot_curves(groups, out, unit),
+        plot_tgrok(groups, out, unit),
+        plot_weight_norm(groups, out),
+    ]

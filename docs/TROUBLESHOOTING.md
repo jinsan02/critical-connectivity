@@ -19,7 +19,7 @@
 | # | 날짜 | 제목 | 영역 | 상태 |
 | --- | --- | --- | --- | --- |
 | T-014 | 11-28 | B-5 Parallel-Mixing 이 wd 0.1 에서 몸통 기울기를 잃고 출력이 정답 분포 평균에 고정됨 | conn · train | 보류 (원인 미확인, 고른 설정에는 없음) |
-| T-013 | 11-27 | 노트북 SSH 가 끊기자 그 안에서 띄운 P1 대기열의 노트북 작업이 exit 4 로 끝남 (본체 프로세스는 생존) | infra | 조치 중 (WMI 로 분리 실행 확인, 실행 스크립트는 다음 대기열 때) |
+| T-013 | 11-27 | 노트북 SSH 가 끊기자 그 안에서 띄운 P1 대기열의 노트북 작업이 exit 4 로 끝남 (본체 프로세스는 생존) | infra | 해결 (`scripts/launch_detached.ps1`, WMI) |
 | T-012 | 11-27 | 본체 critconn 에서 numpy 행렬곱이 0xC06D007F 로 프로세스째 죽음 (MKL · OpenMP) | env | 해결 (본체 사용자 환경 변수 SEQUENTIAL) |
 | T-011 | 11-27 | 대기열의 원장 쓰기 때문에 이후 run 이 모두 `git_dirty 1` 로 기록됨 | train · infra | 해결 (기록 출력 경로를 검사에서 제외) |
 | T-010 | 11-27 | R1 이 [8] 설정으로 100K 스텝 안에 Grokking 하지 않음 — 초기화 스케일 | train · model | 해결 (R1 init_std 1/√d) |
@@ -75,7 +75,7 @@
 
 ## T-013 노트북 SSH 가 끊기자 P1 대기열의 노트북 작업이 exit 4 로 끝남
 - 날짜 · 단계 · 영역: 2026-11-27 · P1 · infra
-- 상태: 조치 중
+- 상태: 해결 (11-28) — `scripts/launch_detached.ps1` 이 WMI 로 띄우고 출력은 `experiments/logs/` 파일. DryRun 으로 SSH 종료 뒤 동작 확인
 ### 발생 로그
 - P1 2단계 대기열(`configs/queue/p1_rest.yaml`)을 노트북의 백그라운드 SSH 명령 안에서 직접 띄웠다
   (`ssh 본체 → cmd → powershell → python scripts/run_queue.py ... | Select-String`), 11:13 시작.
@@ -102,7 +102,7 @@
   - `Invoke-CimMethod Win32_Process -MethodName Create` (WMI) 로 띄운 프로세스는 SSH 종료 뒤에도 끝까지 돌았다 → 이 방법을 쓴다.
   - 11-27 의 고아 프로세스가 살아남은 것은 연결이 비정상으로 끊긴 경우였다. 정상 종료 때와 다르게 동작한 것으로 추정한다.
 ### 재발 방지
-- 긴 작업을 SSH 명령 안에서 직접 실행하지 않는다. 띄우는 스크립트는 다음 대기열을 시작할 때 함께 추가한다.
+- 긴 작업을 SSH 명령 안에서 직접 실행하지 않는다. 대기열은 `scripts/launch_detached.ps1 <대기열>` 로 띄운다.
 
 ## T-012 본체 critconn 에서 numpy 행렬곱이 0xC06D007F 로 프로세스째 죽음 (MKL · OpenMP)
 - 날짜 · 단계 · 영역: 11-27 · G2 · env
