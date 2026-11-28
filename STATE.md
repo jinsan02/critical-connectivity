@@ -31,7 +31,8 @@
 4. ~~원장 열 · run_id 규칙 확정~~ → `feat/ledger-record` (LEDGER_SCHEMA v1, 학습 스크립트가 원장 행을 씀). ~~Gate 2 — R1 10 Seeds (P0) · R2 음성 대조~~ → `exp/p0-gate2` 통과 (R1 10/10, T-011 git_dirty 수정)
 5. (보조) EXP-11 학습 나이테 MVP — Pythia-160M 공개 체크포인트 8개 (기획서 v0.6 §28.6). 다운로드 승인 전에는 시작하지 않는다 (열린 질문 10)
 6. 파일럿 P1 — 설계 `docs/p1-pilot.md` (7종 × 12회 = 84). ~~84회 완료~~ (2026-11-28). 선택 확정 (`docs/p1-pilot.md` 9절): B-1 h11 · B-2 h12 · B-3 h11 · B-4 h04 · B-5 h11 · B-6 h12 · Cross-Model h05, 모두 wd 1.0. ~~지속 창 수정~~ (`early_stop.py` `max_window` · `confirm_extension`)
-7. **P2 1차 밀도 탐색** — 설계 `docs/p2-design.md`, 대기열 `configs/queue/p2.yaml` (60회, 상한 약 44시간), 띄우기 `scripts/launch_detached.ps1`. 띄우기 전 사람 결정: Seed 짝짓기, 사전등록(`docs/preregistration.md` · 분석 코드 · `prereg-v1`)과의 순서 (설계 6절)
+7. **P2 1차 밀도 탐색 진행 중** (2026-11-28 16:55 시작, 60회, 상한 약 44시간) — 설계 `docs/p2-design.md`. **결과는 `prereg-v1` 태그 전까지 열어 보지 않는다** (진행 수 · 오류만 확인)
+8. **Gate 2.5 사전등록** — `docs/preregistration.md` (가설 · 지표 · 판정 · 분석 계획 · 일정 재산정) + 분석 코드(Kaplan–Meier · Cox/AFT · 변화점 · 군집 Bootstrap, `src/analysis/`) → 태그 `prereg-v1`. P2 결과를 보기 전에 끝낸다
 
 ## 사람에게 요청한 것
 
@@ -88,6 +89,8 @@
 | 2026-11-28 | 지속 창 = max(5,000, min(0.5 × 후보, 20,000)), $S_{\max}$ 에서 후보 확인 중이면 창이 끝날 때까지만 연장 (최대 +20K). P2 부터 | 사람 결정 (권장안, 안건 4) — 늦은 Grokking 을 더 엄하게 보는 편향. P1 재판정 확정 46 → 53, 선택은 같음 (`docs/p1-pilot.md` 9.4) |
 | 2026-11-28 | B-5 wd 0.1 붕괴는 짧은 진단까지만 하고 보류 (T-014) | 사람 결정 (권장안, 안건 5) — 고른 설정에 없음 |
 | 2026-11-28 | 본체 긴 작업은 WMI `Win32_Process.Create` 로 띄운다. `Start-Process` 는 SSH 종료 때 같이 죽고, 작업 스케줄러 1회 작업은 실행되지 않음 | 실측 (T-013 11-28 확인) |
+| 2026-11-28 | P2 Seed 는 `init_seed` = `mask_seed` = s (s = 0, 1, 2) | 사람 결정 (권장안) — 마스크 변동을 보고 §12B-4 군집 Bootstrap 단위 3개 |
+| 2026-11-28 | P2 를 사전등록보다 먼저 띄우고, `prereg-v1` 태그 전까지 결과(Grokking 여부 · 곡선 · 판정)를 열어 보지 않는다. 진행 확인은 진행 수 · 오류만 | 사람 결정 (권장안) — GPU 를 쉬지 않으면서 '데이터를 보기 전 동결' (§17) 을 지킨다. 사전등록 문서에 이 순서를 적는다 |
 | 2026-11-27 | 실험 산출물은 모두 모은다: 지표 Parquet 은 run 폴더로 복사해 record 커밋에 넣고(run 하나에 수십 KB), 가중치는 본체 디스크에 두고 목록 · sha256 만 커밋, 대기열 로그도 커밋 | 사람 요청 (나중 전체 분석) — .gitignore 의 '지표 Parquet 은 git 밖' 방침을 run 폴더 사본으로 보완 |
 | 2026-11-27 | 학습 중간 가중치(스냅샷) 8개를 더 남긴다: 스텝 1K · 2K · 5K · 10K · 20K · 50K, 평가 정확도가 처음 50% 를 넘는 스텝(Grokking 직전), Grokking 후보 + 5K. `configs/train/*.yaml` 의 `snapshots`. 지금 도는 P1 2단계에는 적용되지 않고 다음 대기열부터 | 사람 결정 (권장안) — 기획서 §22.1 '궤적 스냅샷 정책은 Gate 2.5 전에', EXP-11 · 층별 변화 분석용. 64M급 run 하나 약 1GB 추가, P2~P7 약 420GB (디스크 여유 1.47TB) |
 | 2026-11-27 | run_id = `<phase>_<exp>_<arch>_<변형>_i<init>m<mask>o<order>`, 학습 스크립트가 만든다 (arch 짧은 이름, 변형 `r<ρ>`/`base`, mask 없으면 `x`) | 사람 결정 (권장안, 열린 질문 3) — STRUCTURE 5절 |
@@ -108,6 +111,7 @@
 
 ## 최근 변경
 
+- 2026-11-28 · Claude Code · P2 시작 (16:55, `launch_detached.ps1`, 60회). Seed 짝짓기 · 결과 가림 결정, COLLAB-LOG C-012
 - 2026-11-28 · Claude Code · P1 빈틈 보완 · P2 준비 (`fix/p1-gaps-p2-prep`): 지속 창 상한 · $S_{\max}$ 확인 연장(`early_stop.py` · `trainer.py`, summary `confirm_extended`), 판정 · 선택 규칙 코드(`src/analysis/selection.py` · `scripts/select_configs.py`, P1 선택 재현 · 출력 고정 4회 표시), 분리 실행 `scripts/launch_detached.ps1` (T-013 해결), 그림 `--unit`, P2 설계 · 대기열 60회
 - 2026-11-28 · Claude Code · Gate 2.5 안건 다섯 가지 결정 (`docs/p1-pilot.md` 9절): 선택 규칙 수정 → B-1 h11 · B-2 h12 · B-4 h04 로 바뀜, 지속 창 상한 20K (P2 부터), B-6 예산 동일, B-5 붕괴 진단(T-014). 열린 질문 12 해소 (초기화는 아키텍처별 선택)
 - 2026-11-28 · Claude Code · **P1 완료** (`exp/p1-b1`): 2단계 6종 72회 기록 · 그림 6묶음 · 선택, 산출물 모으기(run 100개, `experiments/ARTIFACTS.tsv`), 관찰과 Gate 2.5 안건 (`docs/p1-pilot.md` 8절)
