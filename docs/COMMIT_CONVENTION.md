@@ -55,6 +55,7 @@
 | `Ledger` | 쉼표 구분 경로 | 이 커밋이 행을 더한 원장 파일. 존재해야 한다 |
 | `Config-SHA256` | 소문자 64 hex | run 설정 해시. 원장 값과 같아야 한다 |
 | `Invalidates` | `none` 또는 run_id 목록 | 이 수정으로 **무효가 된** 과거 run |
+| `Deviation` | `D-NNN` | 사전등록 `prereg-v1` 뒤 동결 파일(`docs/preregistration.md` 7절)을 바꿀 때. `docs/deviation_log.md` 의 같은 번호. 훅이 없으면 막는다 |
 
 ## 강제 규칙
 

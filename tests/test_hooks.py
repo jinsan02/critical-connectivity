@@ -126,3 +126,15 @@ def test_gitignore_hides_only_root_artifact_dirs():
     ]
     hidden = repo.git("check-ignore", *must_track, root=ROOT).split()
     assert hidden == [], f".gitignore 가 커밋 대상을 숨긴다: {hidden}"
+
+
+def test_deviation_required_after_prereg_tag():
+    msg = "fix(analysis): 변화점 격자\n\n이유.\n\nInvalidates: none"
+    frozen = ["src/analysis/stats.py"]
+    assert not ccm.check(msg, ROOT, source="worktree", staged=frozen, prereg=False)
+    e = ccm.check(msg, ROOT, source="worktree", staged=frozen, prereg=True)
+    assert any("Deviation" in x for x in e)
+    ok = msg + "\nDeviation: D-001"
+    assert not ccm.check(ok, ROOT, source="worktree", staged=frozen, prereg=True)
+    # 동결 파일이 아니면 태그 뒤에도 필요 없다
+    assert not ccm.check(msg, ROOT, source="worktree", staged=["src/models/dense.py"], prereg=True)

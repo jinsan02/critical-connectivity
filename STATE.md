@@ -32,7 +32,8 @@
 5. (보조) EXP-11 학습 나이테 MVP — Pythia-160M 공개 체크포인트 8개 (기획서 v0.6 §28.6). 다운로드 승인 전에는 시작하지 않는다 (열린 질문 10)
 6. 파일럿 P1 — 설계 `docs/p1-pilot.md` (7종 × 12회 = 84). ~~84회 완료~~ (2026-11-28). 선택 확정 (`docs/p1-pilot.md` 9절): B-1 h11 · B-2 h12 · B-3 h11 · B-4 h04 · B-5 h11 · B-6 h12 · Cross-Model h05, 모두 wd 1.0. ~~지속 창 수정~~ (`early_stop.py` `max_window` · `confirm_extension`)
 7. **P2 1차 밀도 탐색 진행 중** (2026-11-28 16:55 시작, 60회, 상한 약 44시간) — 설계 `docs/p2-design.md`. **결과는 `prereg-v1` 태그 전까지 열어 보지 않는다** (진행 수 · 오류만 확인)
-8. **Gate 2.5 사전등록** — 초안 `docs/preregistration.md` + 분석 코드(`src/analysis/stats.py` · `density.py` · `prediction.py` · `connectivity.py`, `scripts/analyze_density.py` · `measure_ceff.py`). 남은 것: 8절 다섯 가지 사람 결정 → 태그 `prereg-v1`. P2 결과를 보기 전에 끝낸다
+8. ~~Gate 2.5 사전등록~~ — `docs/preregistration.md` 확정, 태그 `prereg-v1` (2026-11-28). 이후 동결 파일 변경은 `Deviation:` + `docs/deviation_log.md`
+9. P2 가 끝나면: `scripts/measure_ceff.py --prefix p2_exp02_` → `scripts/analyze_density.py --prefix p2_exp02_` → 사전등록 6절로 P4 밀도 결정, P3 대기열 `configs/queue/p3.yaml` (60회) 띄우기
 
 ## 사람에게 요청한 것
 
@@ -91,6 +92,8 @@
 | 2026-11-28 | 본체 긴 작업은 WMI `Win32_Process.Create` 로 띄운다. `Start-Process` 는 SSH 종료 때 같이 죽고, 작업 스케줄러 1회 작업은 실행되지 않음 | 실측 (T-013 11-28 확인) |
 | 2026-11-28 | P2 Seed 는 `init_seed` = `mask_seed` = s (s = 0, 1, 2) | 사람 결정 (권장안) — 마스크 변동을 보고 §12B-4 군집 Bootstrap 단위 3개 |
 | 2026-11-28 | P2 를 사전등록보다 먼저 띄우고, `prereg-v1` 태그 전까지 결과(Grokking 여부 · 곡선 · 판정)를 열어 보지 않는다. 진행 확인은 진행 수 · 오류만 | 사람 결정 (권장안) — GPU 를 쉬지 않으면서 '데이터를 보기 전 동결' (§17) 을 지킨다. 사전등록 문서에 이 순서를 적는다 |
+| 2026-11-28 | 사전등록 8절: P3 해시 = B-6 h12, 고정 무작위 = Cross-Model h05 설정 · H7 은 P7 전 `prereg-v2` · M2 = log ‖w‖ at $t_0$ · 일정 P1 실측 기준 · 동결 파일 변경에 `Deviation:` 훅 강제 (열린 질문 5 해소) | 사람 결정 (권장안 다섯 가지) — `docs/preregistration.md` 8절 |
+| 2026-11-28 | 사전등록 확정 · 태그 `prereg-v1`. P2 결과 가림 해제 | §17 Gate 2.5 |
 | 2026-11-27 | 실험 산출물은 모두 모은다: 지표 Parquet 은 run 폴더로 복사해 record 커밋에 넣고(run 하나에 수십 KB), 가중치는 본체 디스크에 두고 목록 · sha256 만 커밋, 대기열 로그도 커밋 | 사람 요청 (나중 전체 분석) — .gitignore 의 '지표 Parquet 은 git 밖' 방침을 run 폴더 사본으로 보완 |
 | 2026-11-27 | 학습 중간 가중치(스냅샷) 8개를 더 남긴다: 스텝 1K · 2K · 5K · 10K · 20K · 50K, 평가 정확도가 처음 50% 를 넘는 스텝(Grokking 직전), Grokking 후보 + 5K. `configs/train/*.yaml` 의 `snapshots`. 지금 도는 P1 2단계에는 적용되지 않고 다음 대기열부터 | 사람 결정 (권장안) — 기획서 §22.1 '궤적 스냅샷 정책은 Gate 2.5 전에', EXP-11 · 층별 변화 분석용. 64M급 run 하나 약 1GB 추가, P2~P7 약 420GB (디스크 여유 1.47TB) |
 | 2026-11-27 | run_id = `<phase>_<exp>_<arch>_<변형>_i<init>m<mask>o<order>`, 학습 스크립트가 만든다 (arch 짧은 이름, 변형 `r<ρ>`/`base`, mask 없으면 `x`) | 사람 결정 (권장안, 열린 질문 3) — STRUCTURE 5절 |
@@ -100,7 +103,6 @@
 | # | 정할 것 | 권장 | 막는 것 | 근거 |
 | --- | --- | --- | --- | --- |
 | 4 | lockbox 에 무엇을 넣나 (P7 외부 검증 설정 등) | Gate 2.5 에서 정함 | P7 | RULES 3 |
-| 5 | 사전등록 이후 `src/analysis/` 변경에 `Deviation:` 트레일러를 훅으로 강제할지 | 강제 (RULES 4 가 지금은 사람 확인뿐) | Gate 2.5 | 운영 규칙 원칙 3 |
 | 6 | 라이선스 | 미정 — 없으면 공개 저장소라도 재사용 권한이 없다 | 외부 공개 · 인용 | 기획서 §22.1-4, §27.3 (GPL RFM 코드 사용 여부와 연동) |
 | 10 | EXP-11 MVP 실행 시점과 Pythia 체크포인트 다운로드(약 2.6GB) | Gate 1 벤치마크 뒤 | EXP-11 MVP | 기획서 v0.6 §22.1-9 |
 
@@ -111,6 +113,7 @@
 
 ## 최근 변경
 
+- 2026-11-28 · Claude Code · **사전등록 확정** (`docs/prereg-v1`): 8절 결정 반영, `Deviation:` 커밋 훅(`FROZEN_PATHS`), P3 대기열 60회, COMMIT_CONVENTION 트레일러
 - 2026-11-28 · Claude Code · 사전등록 초안 (`feat/prereg`): 가설 위계 · L1 사건 · $t_0$ 설명 변수 · 분석 절차 · P4 밀도 선택 규칙, 분석 코드(생존 · Weibull AFT · 계단 변화점 + 모수 Bootstrap 우도비 · 군집 Bootstrap · TOST · Holm · LOCO C-index · $C_{eff}$ 측정), 결과 가림 장치, 합성 자료 테스트, `docs/deviation_log.md`
 - 2026-11-28 · Claude Code · P2 시작 (16:55, `launch_detached.ps1`, 60회). Seed 짝짓기 · 결과 가림 결정, COLLAB-LOG C-012
 - 2026-11-28 · Claude Code · P1 빈틈 보완 · P2 준비 (`fix/p1-gaps-p2-prep`): 지속 창 상한 · $S_{\max}$ 확인 연장(`early_stop.py` · `trainer.py`, summary `confirm_extended`), 판정 · 선택 규칙 코드(`src/analysis/selection.py` · `scripts/select_configs.py`, P1 선택 재현 · 출력 고정 4회 표시), 분리 실행 `scripts/launch_detached.ps1` (T-013 해결), 그림 `--unit`, P2 설계 · 대기열 60회
